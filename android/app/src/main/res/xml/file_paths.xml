@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- PDFs copied into the app's private storage; shared to other apps through content:// URIs -->
+    <files-path name="library" path="library/" />
+</paths>
