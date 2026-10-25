@@ -22,7 +22,10 @@ async def test_single_tool_call_then_answer(registry, ctx):
     assert roles == ["user", "assistant", "tool", "assistant"]
     # the tool schemas (cloud + device) were offered to the model
     names = {t["function"]["name"] for t in llm.calls[0]["tools"]}
-    assert names == {"resolve_date", "ask_user", "search_documents", "create_reminder", "send_message"}
+    assert names == {
+        "resolve_date", "ask_user", "search_documents", "remember_fact", "update_timetable",
+        "create_reminder", "send_message"
+    }
 
 
 async def test_invalid_arguments_are_returned_to_the_model_and_retried(registry, ctx):

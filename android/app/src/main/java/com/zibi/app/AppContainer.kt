@@ -16,6 +16,7 @@ import com.zibi.app.library.HandoffLauncher
 import com.zibi.app.library.LibraryApi
 import com.zibi.app.library.LibraryRepository
 import com.zibi.app.net.ZibiClient
+import com.zibi.app.reminders.ReminderScheduler
 import com.zibi.app.tools.AddTaskTool
 import com.zibi.app.tools.AddToListTool
 import com.zibi.app.tools.ApprovalLedger
@@ -24,9 +25,11 @@ import com.zibi.app.tools.CreateReminderTool
 import com.zibi.app.tools.ProposeHandoffTool
 import com.zibi.app.tools.SaveMessageDraftTool
 import com.zibi.app.tools.SendMessageTool
+import com.zibi.app.tools.SetAlarmSeriesTool
 import com.zibi.app.tools.SetAlarmTool
 import com.zibi.app.tools.ToolDispatcher
 import com.zibi.app.tools.ToolRegistry
+import com.zibi.app.tools.UpdateCalendarEventTool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -47,13 +50,17 @@ class AppContainer(app: Application) {
     private val deviceId: String =
         Settings.Secure.getString(app.contentResolver, Settings.Secure.ANDROID_ID) ?: "unknown-device"
     val permissions = PermissionBroker(app)
+    val scheduler = ReminderScheduler(app)
+    val sharedIncomingText = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
 
     // To add a capability (music, notes, ...): write a ZibiTool and add it here. Nothing else changes.
     val registry = ToolRegistry(
         listOf(
-            CreateReminderTool(db.reminderDao()),
+            CreateReminderTool(db.reminderDao(), scheduler),
             CreateCalendarEventTool(app, permissions),
+            UpdateCalendarEventTool(app, permissions),
             SetAlarmTool(app),
+            SetAlarmSeriesTool(app),
             SendMessageTool(app, permissions),
             AddToListTool(db.listDao()),
             AddTaskTool(db.taskDao()),

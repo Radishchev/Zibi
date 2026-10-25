@@ -73,6 +73,37 @@ async def _search_documents(args: dict[str, Any], ctx: Any) -> dict[str, Any]:
     }
 
 
+async def _remember_fact(args: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    key = str(args["key"]).strip().lower().replace(" ", "_")
+    value = str(args["value"]).strip()
+    category = str(args.get("category", "other")).strip().lower()
+    store = getattr(ctx, "profile_store", None)
+    if store is not None and getattr(ctx, "owner", ""):
+        await asyncio.to_thread(store.remember_fact, ctx.owner, key, value, category)
+    # Update in-memory context profile for this turn and subsequent turns
+    profile = getattr(ctx, "profile", None)
+    if isinstance(profile, list):
+        updated = False
+        for f in profile:
+            if f.get("key") == key:
+                f["value"] = value
+                f["category"] = category
+                updated = True
+                break
+        if not updated:
+            profile.append({"category": category, "key": key, "value": value})
+    return {"ok": True, "result": {"key": key, "status": "remembered"}}
+
+
+async def _update_timetable(args: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    entries = args.get("entries") or []
+    store = getattr(ctx, "profile_store", None)
+    if store is not None and getattr(ctx, "owner", ""):
+        await asyncio.to_thread(store.set_timetable, ctx.owner, entries)
+    ctx.timetable = entries
+    return {"ok": True, "result": {"count": len(entries), "status": "timetable_updated"}}
+
+
 def build_default_registry() -> ToolRegistry:
     r = ToolRegistry()
     r.register_cloud(
@@ -141,6 +172,68 @@ def build_default_registry() -> ToolRegistry:
                 location="cloud",
             ),
             fn=_search_documents,
+        )
+    )
+    r.register_cloud(
+        CloudTool(
+            spec=ToolSpec(
+                name="remember_fact",
+                description=(
+                    "Save a lasting fact about the user (routine, habits, preferences, people, study, goals). "
+                    "Use a short stable snake_case key (e.g. alarm_style, wake_time, sleep_time, messaging_app, "
+                    "mom_name). Reusing an existing key updates it."
+                ),
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "key": {"type": "string", "description": "short stable snake_case key"},
+                        "value": {"type": "string", "description": "the fact to remember"},
+                        "category": {
+                            "type": "string",
+                            "enum": ["routine", "study", "preference", "people", "other"],
+                            "description": "category for grouping",
+                        },
+                    },
+                    "required": ["key", "value"],
+                    "additionalProperties": False,
+                },
+                risk=Risk.READ,
+                location="cloud",
+            ),
+            fn=_remember_fact,
+        )
+    )
+    r.register_cloud(
+        CloudTool(
+            spec=ToolSpec(
+                name="update_timetable",
+                description=(
+                    "Update the user's recurring weekly timetable / schedule of classes and activities."
+                ),
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "entries": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "day": {"type": "string", "description": "e.g. Monday, Tuesday"},
+                                    "start": {"type": "string", "description": "HH:MM 24h"},
+                                    "end": {"type": "string", "description": "HH:MM 24h"},
+                                    "title": {"type": "string", "description": "class or activity title"},
+                                },
+                                "required": ["day", "start", "end", "title"],
+                            },
+                        },
+                    },
+                    "required": ["entries"],
+                    "additionalProperties": False,
+                },
+                risk=Risk.READ,
+                location="cloud",
+            ),
+            fn=_update_timetable,
         )
     )
     return r

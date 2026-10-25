@@ -59,6 +59,7 @@ data class ToolSpec(
 )
 
 fun JsonObject.string(key: String): String? = (this[key] as? JsonPrimitive)?.contentOrNull
+fun JsonObject.int(key: String): Int? = (this[key] as? JsonPrimitive)?.contentOrNull?.toIntOrNull()
 
 fun helloEnvelope(
     deviceId: String,

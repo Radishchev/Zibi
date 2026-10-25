@@ -36,8 +36,22 @@ class RemindersViewModel(private val c: AppContainer) : ViewModel() {
     val reminders: StateFlow<List<Reminder>> = c.db.reminderDao().observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun setDone(r: Reminder, done: Boolean) { viewModelScope.launch { c.db.reminderDao().setDone(r.id, done) } }
-    fun delete(r: Reminder) { viewModelScope.launch { c.db.reminderDao().deleteById(r.id) } }
+    fun setDone(r: Reminder, done: Boolean) {
+        viewModelScope.launch {
+            c.db.reminderDao().setDone(r.id, done)
+            if (done) {
+                c.scheduler.cancel(r.id)
+            } else {
+                c.scheduler.schedule(r.copy(done = false))
+            }
+        }
+    }
+    fun delete(r: Reminder) {
+        viewModelScope.launch {
+            c.db.reminderDao().deleteById(r.id)
+            c.scheduler.cancel(r.id)
+        }
+    }
 }
 
 @Composable

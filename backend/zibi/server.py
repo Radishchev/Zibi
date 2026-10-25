@@ -14,6 +14,7 @@ from .config import Settings, load_model_config
 from .context import AgentContext
 from .conversations import Conversations
 from .llm.base import LlmClient, LlmUnavailable
+from .profile import ProfileStore
 from .protocol import Envelope, HelloPayload, T, message_card, new_id
 from .rag import MAX_UPLOAD_BYTES, DocumentStore, PdfProblem, ingest_pdf
 from .session import Session
@@ -28,6 +29,7 @@ def create_app(
     settings: Settings | None = None,
     base_registry: ToolRegistry | None = None,
     store: DocumentStore | None = None,
+    profile_store: ProfileStore | None = None,
 ) -> FastAPI:
     settings = settings or Settings.from_env()
     if llm is None:
@@ -37,6 +39,7 @@ def create_app(
     base_registry = base_registry or build_default_registry()
     store = store or DocumentStore(settings.data_dir / "zibi.db")
     conversations = Conversations(settings.data_dir / "zibi.db")
+    profile_store = profile_store or ProfileStore(settings.data_dir / "zibi.db")
     agent = Agent(llm)
 
     app = FastAPI(title="Zibi backend")
@@ -51,12 +54,21 @@ def create_app(
         except Exception:
             tz = ZoneInfo("UTC")
         docs = await asyncio.to_thread(store.list_documents, session.device_id)
+        persisted_profile = await asyncio.to_thread(profile_store.get_profile, session.device_id)
+        profile_map = {f["key"]: f for f in session.context.get("profile", []) if "key" in f}
+        for f in persisted_profile:
+            profile_map[f["key"]] = f
+
+        persisted_timetable = await asyncio.to_thread(profile_store.get_timetable, session.device_id)
+        timetable = persisted_timetable if persisted_timetable else session.context.get("timetable", [])
+
         return AgentContext(
             now=datetime.now(tz),
             timezone=str(tz),
-            timetable=session.context.get("timetable", []),
+            timetable=timetable,
             preferences=session.context.get("preferences", {}),
-            profile=session.context.get("profile", []),
+            profile=list(profile_map.values()),
+            profile_store=profile_store,
             owner=session.device_id,
             documents=store,
             document_names=[d["name"] for d in docs],

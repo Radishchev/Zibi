@@ -9,7 +9,12 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class CreateReminderTool(private val dao: ReminderDao) : ZibiTool {
+import com.zibi.app.reminders.ReminderScheduler
+
+class CreateReminderTool(
+    private val dao: ReminderDao,
+    private val scheduler: ReminderScheduler? = null,
+) : ZibiTool {
     override val spec = ToolSpec(
         name = "create_reminder",
         description = "Create a reminder on the phone. Use trigger 'on_leaving_home' for things to do before " +
@@ -32,15 +37,15 @@ class CreateReminderTool(private val dao: ReminderDao) : ZibiTool {
     override suspend fun execute(args: JsonObject): ToolResult {
         val title = args.string("title")?.trim()?.takeIf { it.isNotEmpty() }
             ?: return ToolResult.fail("title is required")
-        val id = dao.insert(
-            Reminder(
-                title = title,
-                triggerType = args.string("trigger") ?: "at_time",
-                dueDate = args.string("due_date"),
-                time = args.string("time"),
-                createdAt = System.currentTimeMillis(),
-            )
+        val reminder = Reminder(
+            title = title,
+            triggerType = args.string("trigger") ?: "at_time",
+            dueDate = args.string("due_date"),
+            time = args.string("time"),
+            createdAt = System.currentTimeMillis(),
         )
+        val id = dao.insert(reminder)
+        scheduler?.schedule(reminder.copy(id = id))
         return ToolResult(
             ok = true,
             summary = "Reminder saved: $title",
@@ -51,6 +56,7 @@ class CreateReminderTool(private val dao: ReminderDao) : ZibiTool {
 
     override suspend fun undo(token: String): Boolean {
         val id = token.toLongOrNull() ?: return false
+        scheduler?.cancel(id)
         return dao.deleteById(id) > 0
     }
 }

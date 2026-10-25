@@ -20,6 +20,7 @@ class AgentContext:
     timetable: list[dict[str, Any]] = field(default_factory=list)
     preferences: dict[str, Any] = field(default_factory=dict)
     profile: list[dict[str, Any]] = field(default_factory=list)  # [{category, key, value}]
+    profile_store: Any = None  # ProfileStore
     bridge: Any = None  # set by the agent each turn so cloud tools like ask_user can reach the phone
     owner: str = ""  # the device id; scopes the document library
     documents: Any = None  # DocumentStore

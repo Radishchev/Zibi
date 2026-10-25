@@ -46,8 +46,17 @@ fun ChatScreen(vm: ChatViewModel = appViewModel { ChatViewModel(it) }) {
     val chat by vm.items.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     val conn by vm.connection.collectAsStateWithLifecycle()
+    val sharedText by vm.sharedIncomingText.collectAsStateWithLifecycle()
     var input by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
+
+    LaunchedEffect(sharedText) {
+        val s = sharedText
+        if (!s.isNullOrBlank()) {
+            input = s
+            vm.consumeSharedText()
+        }
+    }
 
     LaunchedEffect(chat.size) {
         if (chat.isNotEmpty()) listState.animateScrollToItem(chat.lastIndex)

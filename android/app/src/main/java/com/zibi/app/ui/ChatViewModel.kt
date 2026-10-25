@@ -49,12 +49,17 @@ class ChatViewModel(private val c: AppContainer) : ViewModel() {
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
 
     val connection: StateFlow<ConnState> = c.client.state
+    val sharedIncomingText: StateFlow<String?> = c.sharedIncomingText.asStateFlow()
 
     private var nextId = 0L
 
     init {
         viewModelScope.launch { c.client.events.collect(::onEvent) }
         c.client.connect()
+    }
+
+    fun consumeSharedText() {
+        c.sharedIncomingText.value = null
     }
 
     private fun add(make: (Long) -> ChatItem) {
