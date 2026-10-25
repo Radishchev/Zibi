@@ -1,6 +1,6 @@
 from tests.conftest import FakeBridge
-from zibi.agent import STUCK_MESSAGE, Agent
-from zibi.llm.base import LlmResponse, ToolCallRequest
+from zibi.agent import INTERRUPTED_NOTE, STUCK_MESSAGE, Agent
+from zibi.llm.base import LlmResponse, LlmUnavailable, ToolCallRequest
 from zibi.llm.fake import FakeLlm
 
 
@@ -85,14 +85,48 @@ async def test_loop_is_capped(registry, ctx):
     assert out == STUCK_MESSAGE and len(bridge.calls) == 3
 
 
-async def test_failed_turn_leaves_history_clean(registry, ctx):
-    llm = FakeLlm([LlmResponse(tool_calls=[call("c1", "create_reminder", title="x")])])  # 2nd call exhausts script
+async def test_failed_turn_keeps_completed_work_and_stays_valid(registry, ctx):
+    llm = FakeLlm([LlmResponse(tool_calls=[call("c1", "create_reminder", title="x")])])  # next call exhausts the script
     history = [{"role": "user", "content": "earlier"}]
+    bridge = FakeBridge()
     try:
-        await Agent(llm).run(FakeBridge(), registry, history, "x", ctx)
+        await Agent(llm).run(bridge, registry, history, "x", ctx)
     except AssertionError:
         pass
-    assert history == [{"role": "user", "content": "earlier"}]
+    roles = [m["role"] for m in history]
+    assert roles == ["user", "user", "assistant", "tool", "assistant"]
+    assert history[-1]["content"] == INTERRUPTED_NOTE
+    assert len(bridge.calls) == 1  # the reminder that was saved is remembered, so a retry won't duplicate it
+
+
+class _BridgeFailsOnSecondCall(FakeBridge):
+    async def call_device_tool(self, name, args, risk):
+        if self.calls:
+            raise RuntimeError("phone vanished")
+        return await super().call_device_tool(name, args, risk)
+
+
+async def test_unanswered_tool_calls_get_a_result_so_history_stays_valid(registry, ctx):
+    llm = FakeLlm([LlmResponse(tool_calls=[call("c1", "create_reminder", title="a"), call("c2", "create_reminder", title="b")])])
+    history = []
+    try:
+        await Agent(llm).run(_BridgeFailsOnSecondCall(), registry, history, "two things", ctx)
+    except RuntimeError:
+        pass
+    tool_ids = [m["tool_call_id"] for m in history if m["role"] == "tool"]
+    assert tool_ids == ["c1", "c2"]  # every call in the assistant message has an answer
+    assert "interrupted" in history[-2]["content"]
+
+
+async def test_failure_with_no_steps_still_keeps_the_users_request(registry, ctx):
+    llm = FakeLlm([LlmUnavailable("rate limited")])
+    history = []
+    try:
+        await Agent(llm).run(FakeBridge(), registry, history, "remind me to call mom", ctx)
+    except LlmUnavailable:
+        pass
+    assert [m["role"] for m in history] == ["user", "assistant"]
+    assert history[0]["content"] == "remind me to call mom"
 
 
 async def test_ask_user_returns_the_answer_to_the_model(registry, ctx):
@@ -118,14 +152,47 @@ async def test_ask_user_with_no_answer_is_an_error_not_a_crash(registry, ctx):
     assert "did not answer" in next(m for m in history if m["role"] == "tool")["content"]
 
 
-async def test_ask_user_needs_at_least_two_options(registry, ctx):
+async def test_ask_user_without_options_is_an_open_question(registry, ctx):
+    # the exact call that crashed the server: an open question with no options
     llm = FakeLlm([
-        LlmResponse(tool_calls=[call("c1", "ask_user", question="Sure?", options=["only one"])]),
+        LlmResponse(tool_calls=[call("c1", "ask_user", question="What time do you usually wake up?")]),
+        LlmResponse(content="Got it."),
+    ])
+    bridge = FakeBridge(answer="around 7")
+    history = []
+    await Agent(llm).run(bridge, registry, history, "set an alarm", ctx)
+    assert bridge.asks == [("What time do you usually wake up?", [])]
+    assert "around 7" in next(m for m in history if m["role"] == "tool")["content"]
+
+
+async def test_ask_user_with_an_empty_options_list_is_also_fine(registry, ctx):
+    llm = FakeLlm([
+        LlmResponse(tool_calls=[call("c1", "ask_user", question="How do you like alarms?", options=[])]),
+        LlmResponse(content="ok"),
+    ])
+    bridge = FakeBridge(answer="loud")
+    await Agent(llm).run(bridge, registry, [], "x", ctx)
+    assert bridge.asks == [("How do you like alarms?", [])]
+
+
+async def test_ask_user_rejects_more_than_four_options_with_feedback(registry, ctx):
+    llm = FakeLlm([
+        LlmResponse(tool_calls=[call("c1", "ask_user", question="Pick", options=list("abcde"))]),
         LlmResponse(content="ok"),
     ])
     bridge, history = FakeBridge(), []
     await Agent(llm).run(bridge, registry, history, "x", ctx)
     assert bridge.asks == [] and "invalid arguments" in next(m for m in history if m["role"] == "tool")["content"]
+
+
+async def test_provider_specific_fields_are_kept_in_history(registry, ctx):
+    tc = ToolCallRequest(id="c1", name="create_reminder", arguments={"title": "x"},
+                         provider_fields={"thought_signature": "sig123"})
+    llm = FakeLlm([LlmResponse(tool_calls=[tc]), LlmResponse(content="ok")])
+    history = []
+    await Agent(llm).run(FakeBridge(), registry, history, "x", ctx)
+    assistant = next(m for m in history if m.get("tool_calls"))
+    assert assistant["tool_calls"][0]["provider_specific_fields"] == {"thought_signature": "sig123"}
 
 
 async def test_system_prompt_teaches_brain_dump_handling(registry, ctx):

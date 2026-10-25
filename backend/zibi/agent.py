@@ -18,6 +18,29 @@ log = logging.getLogger("zibi.agent")
 STUCK_MESSAGE = "Sorry, I got stuck on that one. Could you try rephrasing it?"
 
 
+INTERRUPTED_NOTE = "(I was interrupted by an error before I could finish that request.)"
+
+
+def _repair_after_failure(history: list[dict[str, Any]], start: int) -> None:
+    """Answer any tool call that never got a result, then close the turn with a note."""
+    last_call = next(
+        (i for i in range(len(history) - 1, start - 1, -1)
+         if history[i].get("role") == "assistant" and history[i].get("tool_calls")),
+        None,
+    )
+    if last_call is not None:
+        answered = {m.get("tool_call_id") for m in history[last_call + 1:] if m.get("role") == "tool"}
+        for call in history[last_call]["tool_calls"]:
+            if call["id"] not in answered:
+                history.append({
+                    "role": "tool",
+                    "tool_call_id": call["id"],
+                    "content": json.dumps({"ok": False, "error": "interrupted before this ran"}),
+                })
+    if len(history) > start:
+        history.append({"role": "assistant", "content": INTERRUPTED_NOTE})
+
+
 class DeviceBridge(Protocol):
     """How the agent reaches the phone. The WebSocket Session implements this."""
 
@@ -44,8 +67,9 @@ class Agent:
         try:
             return await self._run(bridge, registry, history, user_text, ctx)
         except BaseException:
-            # never leave a dangling assistant tool_call in history, it would break the next turn
-            del history[start:]
+            # Keep what already happened (a reminder that was saved must not be forgotten, or a retry would
+            # duplicate it), but make the history valid again for the next turn.
+            _repair_after_failure(history, start)
             raise
 
     async def _run(self, bridge, registry, history, user_text, ctx) -> str:
@@ -69,6 +93,7 @@ class Agent:
                             "id": c.id,
                             "type": "function",
                             "function": {"name": c.name, "arguments": json.dumps(c.arguments)},
+                            **({"provider_specific_fields": c.provider_fields} if c.provider_fields else {}),
                         }
                         for c in resp.tool_calls
                     ],

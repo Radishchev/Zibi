@@ -1,14 +1,23 @@
 # Model roles. The agent code only ever refers to ROLES, never model names.
-# Switching providers for production = editing this file (LiteLLM naming: provider/model).
-# Verify names against https://console.groq.com/docs/models, catalogs change.
+# Switching providers = editing this file (LiteLLM naming: provider/model) and exporting that provider's key.
+#
+#   Gemini: GEMINI_API_KEY        Groq: GROQ_API_KEY
+#
+# Model names change quickly (Google retires them without much notice). To see which names your key can use right
+# now, run:   python scripts/check_models.py        (add --ping to make a real test call to each configured model)
 models:
-  orchestrator: groq/openai/gpt-oss-120b
-  fast: groq/openai/gpt-oss-20b
-  vision: groq/meta-llama/llama-4-maverick-17b-128e-instruct
-  stt: groq/whisper-large-v3-turbo
-  # embedding: decided at the RAG phase (Groq has no embedding model)
-  # classifier: future role for cheap typed decisions (route an item, yes/no, score). Candidate: TypeSafe's Jev.
+  orchestrator: gemini/gemini-3.8-flash
+  fast: gemini/gemini-3.8-flash
+  vision: gemini/gemini-3.8-flash        # Gemini reads images natively (photo triage, screenshots)
+  stt: groq/whisper-large-v3-turbo       # not used yet
+  # embedding: decided when we add semantic search
 
-# Only sent when set. gpt-oss accepts low | medium | high.
+# Tried in order when the main model is overloaded (503), rate limited, or retired. Needs that provider's key too.
+# Set ZIBI_FALLBACK_ORCHESTRATOR="" to turn it off.
+fallbacks:
+  orchestrator:
+    - groq/openai/gpt-oss-120b
+
+# Only sent when set. LiteLLM translates it per provider (Gemini: thinking level/budget; gpt-oss: low|medium|high).
 reasoning_effort:
   orchestrator: low

@@ -15,4 +15,7 @@ class FakeLlm:
         self.calls.append({"messages": [dict(m) for m in messages], "tools": tools, "role": role})
         if not self.script:
             raise AssertionError("FakeLlm script exhausted")
-        return self.script.pop(0)
+        item = self.script.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item

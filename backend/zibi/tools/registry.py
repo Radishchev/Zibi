@@ -12,6 +12,20 @@ from .base import CloudTool, ToolSpec
 log = logging.getLogger("zibi.registry")
 
 
+# Providers (Groq, Gemini) validate tool calls themselves and answer a violation with a hard 400 error that we
+# can't recover from. So we send them a lenient schema, and enforce the strict one ourselves, where a violation
+# becomes feedback the model can act on.
+_PROVIDER_UNSUPPORTED = {"additionalProperties", "minItems", "maxItems"}
+
+
+def lenient_schema(schema: Any) -> Any:
+    if isinstance(schema, dict):
+        return {k: lenient_schema(v) for k, v in schema.items() if k not in _PROVIDER_UNSUPPORTED}
+    if isinstance(schema, list):
+        return [lenient_schema(v) for v in schema]
+    return schema
+
+
 class ToolRegistry:
     def __init__(self) -> None:
         self._cloud: dict[str, CloudTool] = {}
@@ -65,7 +79,7 @@ class ToolRegistry:
                 "function": {
                     "name": s.name,
                     "description": s.description,
-                    "parameters": s.parameters,
+                    "parameters": lenient_schema(s.parameters),
                 },
             }
             for s in self.specs()

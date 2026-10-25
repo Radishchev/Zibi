@@ -22,6 +22,8 @@ class Session:
         context: dict[str, Any],
         tool_timeout: float = 30.0,
         confirm_timeout: float = 120.0,
+        history: list[dict[str, Any]] | None = None,
+        run_lock: asyncio.Lock | None = None,
     ) -> None:
         self._send = send
         self._send_lock = asyncio.Lock()
@@ -30,8 +32,8 @@ class Session:
         self.timezone = timezone
         self.registry = registry
         self.context = context
-        self.history: list[dict[str, Any]] = []
-        self.run_lock = asyncio.Lock()  # one agent turn at a time per session
+        self.history: list[dict[str, Any]] = history if history is not None else []
+        self.run_lock = run_lock or asyncio.Lock()  # one agent turn at a time
         self.tool_timeout = tool_timeout
         self.confirm_timeout = confirm_timeout
         self._pending: dict[str, asyncio.Future[Envelope]] = {}

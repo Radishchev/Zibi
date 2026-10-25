@@ -11,6 +11,7 @@ class ToolCallRequest(BaseModel):
     name: str
     arguments: dict[str, Any] = Field(default_factory=dict)
     arguments_error: str | None = None  # set when the model produced unparseable arguments
+    provider_fields: dict[str, Any] | None = None  # e.g. Gemini thought signatures; sent back unchanged
 
 
 class LlmResponse(BaseModel):
@@ -25,3 +26,7 @@ class LlmClient(Protocol):
         tools: list[dict[str, Any]],
         role: str = "orchestrator",
     ) -> LlmResponse: ...
+
+
+class LlmUnavailable(Exception):
+    """The model provider can't answer right now. The message is safe to show to the user."""

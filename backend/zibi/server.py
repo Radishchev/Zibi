@@ -12,7 +12,8 @@ from pydantic import ValidationError
 from .agent import Agent
 from .config import Settings, load_model_config
 from .context import AgentContext
-from .llm.base import LlmClient
+from .conversations import Conversations
+from .llm.base import LlmClient, LlmUnavailable
 from .protocol import Envelope, HelloPayload, T, message_card, new_id
 from .rag import MAX_UPLOAD_BYTES, DocumentStore, PdfProblem, ingest_pdf
 from .session import Session
@@ -35,6 +36,7 @@ def create_app(
         llm = LiteLLMClient(load_model_config(settings.models_file))
     base_registry = base_registry or build_default_registry()
     store = store or DocumentStore(settings.data_dir / "zibi.db")
+    conversations = Conversations(settings.data_dir / "zibi.db")
     agent = Agent(llm)
 
     app = FastAPI(title="Zibi backend")
@@ -54,6 +56,7 @@ def create_app(
             timezone=str(tz),
             timetable=session.context.get("timetable", []),
             preferences=session.context.get("preferences", {}),
+            profile=session.context.get("profile", []),
             owner=session.device_id,
             documents=store,
             document_names=[d["name"] for d in docs],
@@ -85,6 +88,14 @@ def create_app(
         except PdfProblem as e:
             raise HTTPException(status_code=422, detail=str(e)) from None
 
+    @app.delete("/conversation")
+    async def clear_conversation(
+        x_zibi_device: str = Header(), x_zibi_token: str | None = Header(default=None)
+    ) -> dict:
+        check_token(x_zibi_token)
+        await asyncio.to_thread(conversations.clear, x_zibi_device)
+        return {"ok": True}
+
     @app.get("/documents")
     async def list_documents(
         x_zibi_device: str = Header(), x_zibi_token: str | None = Header(default=None)
@@ -108,11 +119,19 @@ def create_app(
                 await session.send(Envelope(type=T.RESPONSE_CARD, payload=message_card(reply)))
             except asyncio.CancelledError:
                 raise
-            except Exception as e:
+            except LlmUnavailable as e:
+                log.warning("model unavailable: %s", e)
+                await session.send(Envelope(type=T.ERROR, payload={"code": "llm_unavailable", "message": str(e)}))
+            except Exception:
                 log.exception("agent turn failed")
                 await session.send(
-                    Envelope(type=T.ERROR, payload={"code": "agent_failed", "message": str(e)})
+                    Envelope(
+                        type=T.ERROR,
+                        payload={"code": "agent_failed", "message": "Something went wrong while thinking. Please try again."},
+                    )
                 )
+            finally:
+                conversations.save(session.device_id)  # also after failures: completed work stays remembered
 
     @app.websocket("/ws")
     async def ws_endpoint(websocket: WebSocket) -> None:
@@ -156,6 +175,8 @@ def create_app(
                         timezone=hello.timezone,
                         registry=registry,
                         context=dict(hello.context),
+                        history=conversations.history(hello.device_id),
+                        run_lock=conversations.lock(hello.device_id),
                     )
                     await session.send(
                         Envelope(

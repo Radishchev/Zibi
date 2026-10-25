@@ -50,7 +50,7 @@ async def _ask_user(args: dict[str, Any], ctx: Any) -> dict[str, Any]:
     bridge = getattr(ctx, "bridge", None)
     if bridge is None:
         return {"ok": False, "error": "cannot ask the user right now"}
-    answer = await bridge.ask(args["question"], list(args["options"]))
+    answer = await bridge.ask(args["question"], list(args.get("options") or []))
     if answer is None:
         return {"ok": False, "error": "the user did not answer"}
     return {"ok": True, "result": {"answer": answer}}
@@ -100,16 +100,17 @@ def build_default_registry() -> ToolRegistry:
             spec=ToolSpec(
                 name="ask_user",
                 description=(
-                    "Ask the user a short multiple-choice question and wait for the answer. The answer may "
-                    "be one of the options or free text the user typed instead."
+                    "Ask the user ONE short question and wait for the answer. Give 2-4 options when the choices "
+                    "are obvious; leave options empty for an open question (the user types the answer). The answer "
+                    "may also be free text the user typed instead of tapping an option."
                 ),
                 parameters={
                     "type": "object",
                     "properties": {
                         "question": {"type": "string"},
-                        "options": {"type": "array", "items": {"type": "string"}, "minItems": 2, "maxItems": 4},
+                        "options": {"type": "array", "items": {"type": "string"}, "maxItems": 4},
                     },
-                    "required": ["question", "options"],
+                    "required": ["question"],
                     "additionalProperties": False,
                 },
                 risk=Risk.READ,
