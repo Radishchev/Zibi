@@ -1,0 +1,25 @@
+# Model roles. The agent code only ever refers to ROLES, never model names.
+# Switching providers = editing this file (LiteLLM naming: provider/model) and exporting that provider's key.
+#
+#   Groq: GROQ_API_KEY        Gemini: GEMINI_API_KEY        NVIDIA NIM: NVIDIA_NIM_API_KEY (NVIDIA_API also works)
+#
+# Model names change quickly and providers get overloaded. To see what works for your keys, and how fast it
+# answers, run:   python scripts/check_models.py --ping
+models:
+  orchestrator: nvidia_nim/nvidia/nemotron-3.5-bolt-e4b    # small and fast (~1 s), tool calls work
+  fast: nvidia_nim/poolside/laguna-xs-2.1
+  vision: gemini/gemini-flash-lite-latest      # Gemini reads images natively (photo triage, screenshots)
+  stt: groq/whisper-large-v3-turbo             # voice messages: POST /transcribe
+  # embedding: decided when we add semantic search
+
+# Tried in order when the main model is overloaded, rate limited or retired. Needs that provider's key too.
+# (Gemini's free tier may use prompts to improve Google's products; see README.) A model that is the same as the
+# main one is ignored. Set ZIBI_FALLBACK_ORCHESTRATOR="" to turn the fallback off.
+fallbacks:
+  orchestrator:
+    - nvidia_nim/poolside/laguna-xs-2.1
+
+# Only sent when set, and skipped for providers that don't support it (nvidia_nim). LiteLLM translates it per
+# provider (gpt-oss: low|medium|high; Gemini: thinking budget).
+reasoning_effort:
+  orchestrator: low
