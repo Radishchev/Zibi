@@ -51,7 +51,7 @@ def create_app(
     async def health() -> dict:
         return {"ok": True}
 
-    async def make_context(session: Session, query: str = "") -> AgentContext:
+    async def make_context(session: Session, query: str = "", shared_content: bool = False) -> AgentContext:
         try:
             tz = ZoneInfo(session.timezone)
         except Exception:
@@ -65,6 +65,7 @@ def create_app(
             profile=session.context.get("profile", []),
             owner=session.device_id,
             query=query,
+            shared_content=shared_content,
             documents=store,
             document_names=[d["name"] for d in docs],
         )
@@ -148,10 +149,13 @@ def create_app(
             raise HTTPException(status_code=404, detail="No such document.")
         return {"ok": True}
 
-    async def run_turn(session: Session, text: str) -> None:
+    async def run_turn(session: Session, text: str, shared_content: bool = False) -> None:
         async with session.run_lock:
             try:
-                reply = await agent.run(session, session.registry, session.history, text, await make_context(session, text))
+                reply = await agent.run(
+                    session, session.registry, session.history, text,
+                    await make_context(session, text, shared_content=shared_content),
+                )
                 await session.send(Envelope(type=T.RESPONSE_CARD, payload=message_card(reply)))
             except asyncio.CancelledError:
                 raise
@@ -236,11 +240,11 @@ def create_app(
                     text, found = redact(text)  # the phone already replaces these; this catches anything that slipped through
                     if found:
                         log.warning("sensitive data reached the server and was masked: %s", found)  # counts only, never values
-                    # typing while a card is waiting answers it (ask) or declines it (confirm)
-                    if session.consume_typed_text(text):
+                    shared_content = env.payload.get("source") == "share"
+                    # Typing while a card is waiting answers it (ask) or declines it (confirm).
+                    if not shared_content and session.consume_typed_text(text):
                         continue
-                    # run in a task so we keep receiving tool results while the agent works
-                    task = asyncio.create_task(run_turn(session, text))
+                    task = asyncio.create_task(run_turn(session, text, shared_content))
                     tasks.add(task)
                     task.add_done_callback(tasks.discard)
                 elif env.type == T.CONTEXT_UPDATE:

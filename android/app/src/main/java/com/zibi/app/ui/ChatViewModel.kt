@@ -8,10 +8,12 @@ import com.zibi.app.library.HandoffTarget
 import com.zibi.app.net.ClientEvent
 import com.zibi.app.net.ConnState
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 sealed interface ChatItem {
     val id: Long
@@ -110,6 +112,22 @@ class ChatViewModel(private val c: AppContainer) : ViewModel() {
             _items.update { list ->
                 list.map { if (it is ChatItem.Handoff && it.id == item.id) it.copy(outcome = message) else it }
             }
+        }
+    }
+
+    fun processSharedContent(text: String) {
+        val t = text.trim()
+        if (t.isEmpty()) return
+        _busy.value = true
+        viewModelScope.launch {
+            val connected = withTimeoutOrNull(30_000) { connection.first { it == ConnState.Connected } } != null
+            if (!connected || !c.client.sendText(t, source = "share")) {
+                draft.value = t
+                add { ChatItem.Problem(it, "Couldn't send the shared text yet. It's in the input box; tap send when connected.") }
+                _busy.value = false
+                return@launch
+            }
+            add { ChatItem.User(it, t) }
         }
     }
 

@@ -116,9 +116,12 @@ class ZibiClient(
     }
 
     /** Sensitive values in [text] are replaced by placeholders first: the server and the AI never see them. */
-    suspend fun sendText(text: String): Boolean {
+    suspend fun sendText(text: String, source: String? = null): Boolean {
         val safe = vault.redact(text).text
-        val env = Envelope(type = MsgType.INPUT_TEXT, payload = buildJsonObject { put("text", safe) })
+        val env = Envelope(type = MsgType.INPUT_TEXT, payload = buildJsonObject {
+            put("text", safe)
+            source?.let { put("source", it) }
+        })
         return socket?.send(env.toJson()) ?: false
     }
 

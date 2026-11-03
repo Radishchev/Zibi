@@ -13,7 +13,7 @@ Every message is an envelope:
 | type | payload | notes |
 |---|---|---|
 | `hello` | `{device_id, timezone, tools:[ToolSpec], context:{timetable, preferences}}` | MUST be first. `tools` is the phone's tool manifest. |
-| `input.text` | `{text}` | starts an agent turn |
+| `input.text` | `{text, source?}` | starts an agent turn; `source: "share"` marks user-selected external text as untrusted material to analyze, not instructions |
 | `context.update` | any keys of `context` (`timetable`, `profile`) | merged into session context. The phone sends the whole `timetable` and `profile` lists whenever they change |
 | `tool.result` | `{ok, result, undo_token?}` | `reply_to` = the `tool.call` id |
 | `tool.error` | `{error}` | `reply_to` = the `tool.call` id |

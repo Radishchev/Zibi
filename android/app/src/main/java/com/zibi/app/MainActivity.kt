@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.zibi.app.bubble.BubbleService
+import com.zibi.app.share.extractIncomingSharedText
 import com.zibi.app.ui.ZibiRoot
 import com.zibi.app.ui.ZibiTheme
 import kotlinx.coroutines.flow.first
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
                 )
             },
         )
+        handleIncomingShare(intent)
         setContent {
             ZibiTheme {
                 ZibiRoot(
@@ -66,6 +68,18 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         requestedScreen = intent.getStringExtra(EXTRA_SCREEN)
+        handleIncomingShare(intent)
+    }
+
+    private fun handleIncomingShare(intent: Intent) {
+        val sharedText = if (intent.action == Intent.ACTION_PROCESS_TEXT) {
+            intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)
+        } else {
+            intent.getCharSequenceExtra(Intent.EXTRA_TEXT)
+        }
+        val text = extractIncomingSharedText(intent.action, intent.type, sharedText) ?: return
+        requestedScreen = SCREEN_CHAT
+        container.chatVm.processSharedContent(text)
     }
 
     override fun onResume() {
