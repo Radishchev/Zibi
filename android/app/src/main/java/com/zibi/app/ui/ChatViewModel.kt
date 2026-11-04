@@ -66,7 +66,17 @@ class ChatViewModel(private val c: AppContainer) : ViewModel() {
 
     init {
         viewModelScope.launch { c.client.events.collect { onEvent(it) } }
+        viewModelScope.launch { c.client.state.collect { clearConnectionProblems(it) } }
         c.client.connect()
+    }
+
+    /** When connection is restored, remove transient connection-related Problem items. */
+    private fun clearConnectionProblems(state: ConnState) {
+        if (state is ConnState.Connected) {
+            _items.update { list ->
+                list.filter { it !is ChatItem.Problem }
+            }
+        }
     }
 
     private fun add(make: (Long) -> ChatItem) {

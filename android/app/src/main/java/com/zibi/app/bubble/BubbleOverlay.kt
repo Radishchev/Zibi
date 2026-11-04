@@ -2,6 +2,7 @@ package com.zibi.app.bubble
 
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,8 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +34,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RadialGradient
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +51,8 @@ import com.zibi.app.appContainer
 import com.zibi.app.ui.ChatScreen
 import com.zibi.app.ui.QuickScreen
 import kotlin.math.hypot
+import kotlin.math.max
+import kotlin.math.min
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -75,13 +80,16 @@ fun BubbleOverlay(
     }
 
     if (!isExpanded) {
-        // Collapsed: AssistiveTouch-style floating bubble
+        // Collapsed: AssistiveTouch-style floating bubble (iPhone 5 reference)
         Box(
             modifier = Modifier
                 .size(56.dp)
                 .shadow(8.dp, CircleShape)
-                .background(MaterialTheme.colorScheme.surface, CircleShape)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), CircleShape)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f), CircleShape)
+                .semantics {
+                    contentDescription = if (recording) "Recording, open Zibi to stop" else "Open Zibi"
+                }
                 .pointerInteropFilter { event ->
                     when (event.actionMasked) {
                         MotionEvent.ACTION_DOWN -> {
@@ -114,12 +122,7 @@ fun BubbleOverlay(
                 },
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = if (recording) Icons.Filled.Pause else Icons.Filled.Mic,
-                contentDescription = if (recording) "Recording - tap to stop" else "Open Zibi",
-                tint = if (recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(24.dp),
-            )
+            AssistiveTouchGlyph(recording = recording)
         }
     } else {
         // Expanded: the overlay window is sized to exactly the panel, so only the
@@ -181,6 +184,23 @@ fun BubbleOverlay(
                 }
             }
         }
+    }
+}
+
+/**
+ * The classic iPhone AssistiveTouch mark: a ring with a dot at its centre.
+ * Stroke weight, dot size, and proportions match the iOS reference.
+ * The dot swells and turns red while recording.
+ */
+@Composable
+private fun AssistiveTouchGlyph(recording: Boolean, modifier: Modifier = Modifier) {
+    val tint = if (recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+    Canvas(modifier.size(28.dp)) {
+        val stroke = 3.5.dp.toPx()
+        val ringRadius = (size.minDimension - stroke) / 2f
+        drawCircle(color = tint, radius = ringRadius, style = Stroke(width = stroke))
+        val dotRadius = if (recording) size.minDimension * 0.22f else size.minDimension * 0.16f
+        drawCircle(color = tint, radius = dotRadius)
     }
 }
 

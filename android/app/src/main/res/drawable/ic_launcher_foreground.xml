@@ -4,19 +4,13 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Microphone icon centered in 108x108 safe zone (66dp visible area for adaptive icons) -->
-    <group android:translateX="21" android:translateY="21">
-        <!-- Mic body -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M33,54 C33,44.6 40.6,37 51,37 C61.4,37 69,44.6 69,54 L69,84 C69,93.4 61.4,101 51,101 C40.6,101 33,93.4 33,84 L33,54 Z" />
-        <!-- Mic stand -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M44,84 C44,92.3 51,99 51,99 C51,99 58,92.3 58,84 L58,84 Z" />
-        <!-- Mic cord/base -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M48,99 L60,99 C60,99 60,105 51,105 C42,105 42,99 42,99 L48,99 Z" />
-    </group>
+    <!-- AssistiveTouch mark: a ring with a dot at its centre, centred in the 66dp safe zone -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:fillColor="#00000000"
+        android:pathData="M34,54 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M49,54 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
 </vector>
