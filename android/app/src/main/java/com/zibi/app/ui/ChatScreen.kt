@@ -26,7 +26,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,13 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zibi.app.appContainer
 import com.zibi.app.library.HandoffTarget
-import com.zibi.app.net.ConnState
 
 @Composable
 fun ChatScreen(vm: ChatViewModel = appContainer().chatVm) {
     val chat by vm.items.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
-    val conn by vm.connection.collectAsStateWithLifecycle()
     val recording by vm.recording.collectAsStateWithLifecycle()
     val transcribing by vm.transcribing.collectAsStateWithLifecycle()
     val input by vm.draft.collectAsStateWithLifecycle()
@@ -56,7 +53,6 @@ fun ChatScreen(vm: ChatViewModel = appContainer().chatVm) {
     }
 
     Column(Modifier.fillMaxSize().imePadding()) {
-        ConnectionBar(conn, onReconnect = vm::reconnect)
         if (chat.isEmpty()) {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(
@@ -102,26 +98,6 @@ fun ChatScreen(vm: ChatViewModel = appContainer().chatVm) {
                 onClick = { vm.send(input) },
                 enabled = input.isNotBlank(),
             ) { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send") }
-        }
-    }
-}
-
-@Composable
-private fun ConnectionBar(conn: ConnState, onReconnect: () -> Unit) {
-    val label = when (conn) {
-        ConnState.Connected -> "Connected"
-        ConnState.Connecting -> "Connecting…"
-        ConnState.Disconnected -> "Offline"
-        is ConnState.Failed -> "Offline: ${conn.message}"
-    }
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(label, style = MaterialTheme.typography.labelMedium)
-        if (conn !is ConnState.Connected && conn !is ConnState.Connecting) {
-            TextButton(onClick = onReconnect) { Text("Reconnect") }
         }
     }
 }

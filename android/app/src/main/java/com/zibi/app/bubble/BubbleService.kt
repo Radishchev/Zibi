@@ -43,6 +43,9 @@ class BubbleService : Service(), LifecycleOwner, SavedStateRegistryOwner, ViewMo
         private const val CHANNEL_ID = "bubble_channel"
         private const val NOTIFICATION_ID = 1001
         private const val BUBBLE_SIZE_DP = 56
+        private const val PANEL_WIDTH_DP = 320
+        private const val PANEL_HEIGHT_DP = 480
+        private const val PANEL_MARGIN_DP = 16
         private const val POSITION_PREFS = "bubble_position"
         private const val POSITION_X = "x"
         private const val POSITION_Y = "y"
@@ -66,6 +69,8 @@ class BubbleService : Service(), LifecycleOwner, SavedStateRegistryOwner, ViewMo
     private var dragDownRawX = 0f
     private var dragDownRawY = 0f
     private var dockAnimator: ValueAnimator? = null
+    private var panelExpanded = false
+    private var lastBubblePosition: BubblePosition? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -189,6 +194,7 @@ class BubbleService : Service(), LifecycleOwner, SavedStateRegistryOwner, ViewMo
                         onDragStart = ::beginBubbleDrag,
                         onDrag = ::moveBubble,
                         onDragEnd = ::finishBubbleDrag,
+                        onPanelExpandedChanged = ::setPanelExpanded,
                     )
                 }
             }
@@ -219,6 +225,7 @@ class BubbleService : Service(), LifecycleOwner, SavedStateRegistryOwner, ViewMo
             val position = BubblePositioning.clamp(initial, screenWidth, sizePx, screenHeight)
             x = position.x
             y = position.y
+            lastBubblePosition = position
         }
         layoutParams = params
 
@@ -227,6 +234,61 @@ class BubbleService : Service(), LifecycleOwner, SavedStateRegistryOwner, ViewMo
         } catch (_: Exception) {
             Toast.makeText(this, "Overlay permission required", Toast.LENGTH_LONG).show()
             stopSelf()
+        }
+    }
+
+    private fun setPanelExpanded(expanded: Boolean) {
+        if (panelExpanded == expanded) return
+        panelExpanded = expanded
+
+        val params = layoutParams ?: return
+        val (screenWidth, screenHeight) = screenSize()
+        val density = resources.displayMetrics.density
+
+        if (expanded) {
+            // Save current bubble position before expanding
+            lastBubblePosition = BubblePosition(params.x, params.y)
+
+            // Calculate panel position
+            val panelWidthPx = (PANEL_WIDTH_DP * density).toInt()
+            val panelHeightPx = (PANEL_HEIGHT_DP * density).toInt()
+            val marginPx = (PANEL_MARGIN_DP * density).toInt()
+
+            val panelPos = BubblePositioning.panelPosition(
+                dockedPosition = lastBubblePosition!!,
+                screenWidth = screenWidth,
+                screenHeight = screenHeight,
+                panelWidth = panelWidthPx,
+                panelHeight = panelHeightPx,
+                margin = marginPx,
+            )
+
+            // Update window layout for panel
+            params.width = panelWidthPx
+            params.height = panelHeightPx
+            params.x = panelPos.x
+            params.y = panelPos.y
+
+            // Enable focus for IME text input
+            params.flags = params.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+            params.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        } else {
+            // Restore bubble size and position
+            val sizePx = (BUBBLE_SIZE_DP * density).toInt()
+            params.width = sizePx
+            params.height = sizePx
+            params.x = lastBubblePosition?.x ?: (screenWidth - sizePx - (16 * density).toInt())
+            params.y = lastBubblePosition?.y ?: (screenHeight / 3)
+
+            // Disable focus when collapsed
+            params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            params.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED
+        }
+
+        try {
+            composeView?.let { windowManager.updateViewLayout(it, params) }
+        } catch (_: IllegalArgumentException) {
+        } catch (_: WindowManager.BadTokenException) {
         }
     }
 }

@@ -25,4 +25,19 @@ object BubblePositioning {
         val x = if (clamped.x + bubbleSize / 2 < screenWidth / 2) 0 else (screenWidth - bubbleSize).coerceAtLeast(0)
         return BubblePosition(x, clamped.y)
     }
+
+    fun panelPosition(
+        dockedPosition: BubblePosition,
+        screenWidth: Int,
+        screenHeight: Int,
+        panelWidth: Int,
+        panelHeight: Int,
+        margin: Int,
+    ): BubblePosition {
+        val isLeft = dockedPosition.x < screenWidth / 2
+        val x = if (isLeft) margin else (screenWidth - panelWidth - margin).coerceAtLeast(margin)
+        val maxY = (screenHeight - panelHeight - margin).coerceAtLeast(margin)
+        val y = dockedPosition.y.coerceIn(margin, maxY)
+        return BubblePosition(x, y)
+    }
 }

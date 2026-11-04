@@ -43,6 +43,12 @@ sealed interface ConnState {
     data class Failed(val message: String) : ConnState
 }
 
+internal fun shouldOpenConnection(wantConnected: Boolean, startedGeneration: Int, currentGeneration: Int): Boolean =
+    wantConnected && startedGeneration == currentGeneration
+
+internal fun shouldStartConnection(wantConnected: Boolean, state: ConnState): Boolean =
+    !wantConnected && state !is ConnState.Connecting && state !is ConnState.Connected
+
 /** What the UI cares about. Everything else (tool calls, handshakes) is handled inside the client. */
 sealed interface ClientEvent {
     data class Message(val text: String) : ClientEvent
@@ -94,8 +100,7 @@ class ZibiClient(
     }
 
     fun connect() {
-        val s = _state.value
-        if (wantConnected && (s is ConnState.Connected || s is ConnState.Connecting)) return
+        if (!shouldStartConnection(wantConnected, _state.value)) return
         wantConnected = true
         retryJob?.cancel()
         scope.launch { open() }
@@ -137,6 +142,7 @@ class ZibiClient(
     // --- internals ---------------------------------------------------------------
 
     private suspend fun open() {
+        if (!wantConnected) return
         socket?.cancel()
         val gen = ++generation
         _state.value = ConnState.Connecting
@@ -148,6 +154,7 @@ class ZibiClient(
             _state.value = ConnState.Failed("Invalid server URL")
             return
         }
+        if (!shouldOpenConnection(wantConnected, gen, generation)) return
         socket = http.newWebSocket(request, listener(gen))
     }
 

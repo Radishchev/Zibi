@@ -37,6 +37,7 @@ class Session:
         self.tool_timeout = tool_timeout
         self.confirm_timeout = confirm_timeout
         self._pending: dict[str, asyncio.Future[Envelope]] = {}
+        self._pending_types: dict[str, frozenset[str]] = {}
         self._cards: dict[str, str] = {}  # id of a card waiting for the user -> "ask" | "confirm"
 
     async def send(self, env: Envelope) -> None:
@@ -46,8 +47,9 @@ class Session:
 
     # --- replies from the phone -------------------------------------------------
     def resolve(self, env: Envelope) -> None:
-        fut = self._pending.get(env.reply_to or "")
-        if fut and not fut.done():
+        reply_to = env.reply_to or ""
+        fut = self._pending.get(reply_to)
+        if fut and not fut.done() and env.type in self._pending_types[reply_to]:
             fut.set_result(env)
 
     def consume_typed_text(self, text: str) -> bool:
@@ -69,9 +71,10 @@ class Session:
                 fut.cancel()
         self._pending.clear()
 
-    async def _request(self, env: Envelope, timeout: float) -> Envelope | None:
+    async def _request(self, env: Envelope, timeout: float, reply_types: frozenset[str]) -> Envelope | None:
         fut: asyncio.Future[Envelope] = asyncio.get_running_loop().create_future()
         self._pending[env.id] = fut
+        self._pending_types[env.id] = reply_types
         try:
             await self.send(env)
             return await asyncio.wait_for(fut, timeout)
@@ -79,11 +82,12 @@ class Session:
             return None
         finally:
             self._pending.pop(env.id, None)
+            self._pending_types.pop(env.id, None)
 
     async def _card_request(self, card: Envelope, kind: str) -> Envelope | None:
         self._cards[card.id] = kind
         try:
-            return await self._request(card, self.confirm_timeout)
+            return await self._request(card, self.confirm_timeout, frozenset({T.UI_ACTION}))
         finally:
             self._cards.pop(card.id, None)
 
@@ -94,7 +98,7 @@ class Session:
             type=T.TOOL_CALL,
             payload={"tool": name, "args": args, "risk": risk.value},
         )
-        reply = await self._request(call, self.tool_timeout)
+        reply = await self._request(call, self.tool_timeout, frozenset({T.TOOL_RESULT, T.TOOL_ERROR}))
         if reply is None:
             return {"ok": False, "error": "timeout: the phone did not respond"}
         if reply.type == T.TOOL_ERROR:

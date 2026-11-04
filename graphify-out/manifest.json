@@ -1,0 +1,620 @@
+{
+  ".vscode/settings.json": {
+    "mtime": 1793592193.0225012,
+    "seen": 1793714019.6244931,
+    "ast_hash": "4b52d607b0dea6bf4af92c7f94fc92e9",
+    "semantic_hash": "4b52d607b0dea6bf4af92c7f94fc92e9"
+  },
+  "android/app/build.gradle.kts": {
+    "mtime": 1793533213.3248935,
+    "seen": 1793714019.6244984,
+    "ast_hash": "141aa10511da2ef62ce8b1f52d0fce9a",
+    "semantic_hash": "141aa10511da2ef62ce8b1f52d0fce9a"
+  },
+  "android/app/src/main/java/com/zibi/app/AppContainer.kt": {
+    "mtime": 1793560805.4807029,
+    "seen": 1793714019.624501,
+    "ast_hash": "a2407bc1b15cb07329b69d6b6f75816a",
+    "semantic_hash": "a2407bc1b15cb07329b69d6b6f75816a"
+  },
+  "android/app/src/main/java/com/zibi/app/MainActivity.kt": {
+    "mtime": 1793594307.7430727,
+    "seen": 1793714019.624502,
+    "ast_hash": "cd30a98c91c9d968086c7155d5206b42",
+    "semantic_hash": "cd30a98c91c9d968086c7155d5206b42"
+  },
+  "android/app/src/main/java/com/zibi/app/PermissionBroker.kt": {
+    "mtime": 1793560686.4397085,
+    "seen": 1793714019.6245031,
+    "ast_hash": "355b765e82151eaf52558d409d455438",
+    "semantic_hash": "355b765e82151eaf52558d409d455438"
+  },
+  "android/app/src/main/java/com/zibi/app/ZibiApp.kt": {
+    "mtime": 1792680274.0,
+    "seen": 1793714019.6245039,
+    "ast_hash": "8520fdb5d69908a52405049ca187eda0",
+    "semantic_hash": "8520fdb5d69908a52405049ca187eda0"
+  },
+  "android/app/src/main/java/com/zibi/app/bubble/BubbleOverlay.kt": {
+    "mtime": 1793588262.052737,
+    "seen": 1793714019.6245046,
+    "ast_hash": "85b4d9a3d45939c9f3492d9b1d3d2f0c",
+    "semantic_hash": "85b4d9a3d45939c9f3492d9b1d3d2f0c"
+  },
+  "android/app/src/main/java/com/zibi/app/bubble/BubblePositioning.kt": {
+    "mtime": 1793588115.7916207,
+    "seen": 1793714019.6245053,
+    "ast_hash": "76192fafb7214ee07292d4bf71e52610",
+    "semantic_hash": "76192fafb7214ee07292d4bf71e52610"
+  },
+  "android/app/src/main/java/com/zibi/app/bubble/BubbleService.kt": {
+    "mtime": 1793588231.0235126,
+    "seen": 1793714019.6245058,
+    "ast_hash": "6f5b021656ccfe796410524fe8fae90b",
+    "semantic_hash": "6f5b021656ccfe796410524fe8fae90b"
+  },
+  "android/app/src/main/java/com/zibi/app/library/HandoffLauncher.kt": {
+    "mtime": 1792727020.0,
+    "seen": 1793714019.6245067,
+    "ast_hash": "a6d7f062fe507df3cd0c0498b4850967",
+    "semantic_hash": "a6d7f062fe507df3cd0c0498b4850967"
+  },
+  "android/app/src/main/java/com/zibi/app/library/LibraryApi.kt": {
+    "mtime": 1792807030.0,
+    "seen": 1793714019.6245072,
+    "ast_hash": "2ca1b19c4b7ee36b3db76fc44456aff0",
+    "semantic_hash": "2ca1b19c4b7ee36b3db76fc44456aff0"
+  },
+  "android/app/src/main/java/com/zibi/app/library/LibraryRepository.kt": {
+    "mtime": 1792726962.0,
+    "seen": 1793714019.6245081,
+    "ast_hash": "c96140660c8fa7a7159944edd5a24833",
+    "semantic_hash": "c96140660c8fa7a7159944edd5a24833"
+  },
+  "android/app/src/main/java/com/zibi/app/net/ZibiClient.kt": {
+    "mtime": 1793592552.0452654,
+    "seen": 1793714019.6245086,
+    "ast_hash": "c9f0f84be4856aa873f17c827ae8ff4a",
+    "semantic_hash": "c9f0f84be4856aa873f17c827ae8ff4a"
+  },
+  "android/app/src/main/java/com/zibi/app/privacy/PrivacyVault.kt": {
+    "mtime": 1793454902.0,
+    "seen": 1793714019.6245093,
+    "ast_hash": "569ed9a7d00318226cc40245318c3013",
+    "semantic_hash": "569ed9a7d00318226cc40245318c3013"
+  },
+  "android/app/src/main/java/com/zibi/app/privacy/Redactor.kt": {
+    "mtime": 1793454902.0,
+    "seen": 1793714019.62451,
+    "ast_hash": "59352ee4d0e78813ea4a00a6534f8103",
+    "semantic_hash": "59352ee4d0e78813ea4a00a6534f8103"
+  },
+  "android/app/src/main/java/com/zibi/app/privacy/SecretCipher.kt": {
+    "mtime": 1793454902.0,
+    "seen": 1793714019.6245108,
+    "ast_hash": "04012349bd6f1836c1d7dd4f54c96927",
+    "semantic_hash": "04012349bd6f1836c1d7dd4f54c96927"
+  },
+  "android/app/src/main/java/com/zibi/app/profile/ProfileRepository.kt": {
+    "mtime": 1793472716.0,
+    "seen": 1793714019.6245112,
+    "ast_hash": "6884c480b79b37fff9eb018b75d108f0",
+    "semantic_hash": "6884c480b79b37fff9eb018b75d108f0"
+  },
+  "android/app/src/main/java/com/zibi/app/protocol/Protocol.kt": {
+    "mtime": 1793454922.0,
+    "seen": 1793714019.6245117,
+    "ast_hash": "411cc6c978611970e7f2b7156c9116f2",
+    "semantic_hash": "411cc6c978611970e7f2b7156c9116f2"
+  },
+  "android/app/src/main/java/com/zibi/app/share/SharedText.kt": {
+    "mtime": 1793594282.9452617,
+    "seen": 1793714019.6245124,
+    "ast_hash": "30d480558a63073704be506f119c6453",
+    "semantic_hash": "30d480558a63073704be506f119c6453"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/CalendarMath.kt": {
+    "mtime": 1792934782.0,
+    "seen": 1793714019.6245134,
+    "ast_hash": "b0dd0a4ca2c549320c09177bb7fa7e06",
+    "semantic_hash": "b0dd0a4ca2c549320c09177bb7fa7e06"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/CaptureTools.kt": {
+    "mtime": 1793536066.5407383,
+    "seen": 1793714019.6245139,
+    "ast_hash": "9dd061cbe93c5064ee4f120595d5c21c",
+    "semantic_hash": "9dd061cbe93c5064ee4f120595d5c21c"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/EmailTool.kt": {
+    "mtime": 1793558327.2967687,
+    "seen": 1793714019.6245143,
+    "ast_hash": "01bc6439b6ba9d69f1b9b78952625b60",
+    "semantic_hash": "01bc6439b6ba9d69f1b9b78952625b60"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/HandoffTool.kt": {
+    "mtime": 1792726962.0,
+    "seen": 1793714019.624515,
+    "ast_hash": "bb70733f6131966c07d5bd0f4ab05def",
+    "semantic_hash": "bb70733f6131966c07d5bd0f4ab05def"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/IntentTools.kt": {
+    "mtime": 1792934808.0,
+    "seen": 1793714019.6245158,
+    "ast_hash": "8c2c571c503600ab8bcdff26f2b565ea",
+    "semantic_hash": "8c2c571c503600ab8bcdff26f2b565ea"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/MessageTool.kt": {
+    "mtime": 1792710038.0,
+    "seen": 1793714019.6245162,
+    "ast_hash": "ac5a329dcab007cdd1628dd8f9721b2d",
+    "semantic_hash": "ac5a329dcab007cdd1628dd8f9721b2d"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/ProfileTools.kt": {
+    "mtime": 1793454972.0,
+    "seen": 1793714019.6245172,
+    "ast_hash": "03d8bebdff3b5656709f3e7478d094a0",
+    "semantic_hash": "03d8bebdff3b5656709f3e7478d094a0"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/ReminderScheduler.kt": {
+    "mtime": 1793561737.9830682,
+    "seen": 1793714019.6245177,
+    "ast_hash": "9ae7963c266c43c411f57bacdbc50c5e",
+    "semantic_hash": "9ae7963c266c43c411f57bacdbc50c5e"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/ReminderTool.kt": {
+    "mtime": 1793561748.274479,
+    "seen": 1793714019.6245184,
+    "ast_hash": "106009d08f854609a0c3ab60431fd16d",
+    "semantic_hash": "106009d08f854609a0c3ab60431fd16d"
+  },
+  "android/app/src/main/java/com/zibi/app/tools/ZibiTool.kt": {
+    "mtime": 1793472716.0,
+    "seen": 1793714019.6245189,
+    "ast_hash": "7f2020752477caf9840ef1577aa4eee2",
+    "semantic_hash": "7f2020752477caf9840ef1577aa4eee2"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/ActivityScreen.kt": {
+    "mtime": 1792727004.0,
+    "seen": 1793714019.6245196,
+    "ast_hash": "6e48ea4de64503ace0b9497bdb69af2f",
+    "semantic_hash": "6e48ea4de64503ace0b9497bdb69af2f"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/ChatScreen.kt": {
+    "mtime": 1793547427.2345712,
+    "seen": 1793714019.6245203,
+    "ast_hash": "8d265b497c83ea5fa1efa046e25bf7c7",
+    "semantic_hash": "8d265b497c83ea5fa1efa046e25bf7c7"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/ChatViewModel.kt": {
+    "mtime": 1793592622.5125296,
+    "seen": 1793714019.6245208,
+    "ast_hash": "60ee9b0462fe23b6dd652909daf7f7ea",
+    "semantic_hash": "60ee9b0462fe23b6dd652909daf7f7ea"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/HistoryScreen.kt": {
+    "mtime": 1792680318.0,
+    "seen": 1793714019.6245215,
+    "ast_hash": "a3dfb77c9937f02bacc502f981b76020",
+    "semantic_hash": "a3dfb77c9937f02bacc502f981b76020"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/LibraryScreen.kt": {
+    "mtime": 1792727004.0,
+    "seen": 1793714019.624522,
+    "ast_hash": "78368bd6cb21b08032a045d3da41b612",
+    "semantic_hash": "78368bd6cb21b08032a045d3da41b612"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/ProfileScreen.kt": {
+    "mtime": 1793472748.0,
+    "seen": 1793714019.6245227,
+    "ast_hash": "de84a80cef42e270e74824c12a57bbfb",
+    "semantic_hash": "de84a80cef42e270e74824c12a57bbfb"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/QuickScreen.kt": {
+    "mtime": 1793558266.6532965,
+    "seen": 1793714019.6245234,
+    "ast_hash": "9cf7b1d57d6041d03c09d9a10691ceee",
+    "semantic_hash": "9cf7b1d57d6041d03c09d9a10691ceee"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/RemindersScreen.kt": {
+    "mtime": 1793560812.7173915,
+    "seen": 1793714019.624524,
+    "ast_hash": "eae1802dcf3043d426fc6f0dbff59638",
+    "semantic_hash": "eae1802dcf3043d426fc6f0dbff59638"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/SettingsScreen.kt": {
+    "mtime": 1793557019.9852488,
+    "seen": 1793714019.6245246,
+    "ast_hash": "b14a697b0793c87a862d310e97dfb526",
+    "semantic_hash": "b14a697b0793c87a862d310e97dfb526"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/Theme.kt": {
+    "mtime": 1792680318.0,
+    "seen": 1793714019.624525,
+    "ast_hash": "dbcd07fe83e386f941a28a004e820923",
+    "semantic_hash": "dbcd07fe83e386f941a28a004e820923"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/YouScreen.kt": {
+    "mtime": 1792848812.0,
+    "seen": 1793714019.6245258,
+    "ast_hash": "bf214bfd5a73c502c9ded355d44fd0be",
+    "semantic_hash": "bf214bfd5a73c502c9ded355d44fd0be"
+  },
+  "android/app/src/main/java/com/zibi/app/ui/ZibiRoot.kt": {
+    "mtime": 1793559454.5148315,
+    "seen": 1793714019.6245263,
+    "ast_hash": "ffbb5ea1a0d77bc5bf3153415fe27d65",
+    "semantic_hash": "ffbb5ea1a0d77bc5bf3153415fe27d65"
+  },
+  "android/app/src/main/java/com/zibi/app/voice/SttApi.kt": {
+    "mtime": 1793532598.779788,
+    "seen": 1793714019.6245267,
+    "ast_hash": "3a8e09dbcb946503eeee18ff543685f1",
+    "semantic_hash": "3a8e09dbcb946503eeee18ff543685f1"
+  },
+  "android/app/src/main/java/com/zibi/app/voice/VoiceRecorder.kt": {
+    "mtime": 1793532598.7377875,
+    "seen": 1793714019.6245277,
+    "ast_hash": "3adcce1fd5e2b335dc0c4389a27ca6aa",
+    "semantic_hash": "3adcce1fd5e2b335dc0c4389a27ca6aa"
+  },
+  "android/app/src/test/java/com/zibi/app/AlarmPlanTest.kt": {
+    "mtime": 1792934830.0,
+    "seen": 1793714019.6245286,
+    "ast_hash": "b988e544fe8e1d3362362d2804c9bb87",
+    "semantic_hash": "b988e544fe8e1d3362362d2804c9bb87"
+  },
+  "android/app/src/test/java/com/zibi/app/BubblePositioningTest.kt": {
+    "mtime": 1793588086.688379,
+    "seen": 1793714019.6245291,
+    "ast_hash": "99548c51c426658b9158e05ad5e0292e",
+    "semantic_hash": "99548c51c426658b9158e05ad5e0292e"
+  },
+  "android/app/src/test/java/com/zibi/app/CaptureToolsTest.kt": {
+    "mtime": 1792711434.0,
+    "seen": 1793714019.6245298,
+    "ast_hash": "8445b8448420c81f09afd844e6a6c606",
+    "semantic_hash": "8445b8448420c81f09afd844e6a6c606"
+  },
+  "android/app/src/test/java/com/zibi/app/DispatcherTest.kt": {
+    "mtime": 1793472796.0,
+    "seen": 1793714019.6245303,
+    "ast_hash": "f374b00bd6c35965a9e932e8a267fdc9",
+    "semantic_hash": "f374b00bd6c35965a9e932e8a267fdc9"
+  },
+  "android/app/src/test/java/com/zibi/app/EmailToolTest.kt": {
+    "mtime": 1793558280.5832844,
+    "seen": 1793714019.6245313,
+    "ast_hash": "5e945b0b717f70dad23af5533af870c8",
+    "semantic_hash": "5e945b0b717f70dad23af5533af870c8"
+  },
+  "android/app/src/test/java/com/zibi/app/LibraryTest.kt": {
+    "mtime": 1792727004.0,
+    "seen": 1793714019.624532,
+    "ast_hash": "407559633717f2441331559ea1fe5246",
+    "semantic_hash": "407559633717f2441331559ea1fe5246"
+  },
+  "android/app/src/test/java/com/zibi/app/MemoryTest.kt": {
+    "mtime": 1793506644.0,
+    "seen": 1793714019.6245325,
+    "ast_hash": "efd2df0e43f432cc7848c4035ea0114e",
+    "semantic_hash": "efd2df0e43f432cc7848c4035ea0114e"
+  },
+  "android/app/src/test/java/com/zibi/app/ProfileAndTimeTest.kt": {
+    "mtime": 1793472796.0,
+    "seen": 1793714019.624533,
+    "ast_hash": "825f00eec0c175ed55c4bb0914f4814d",
+    "semantic_hash": "825f00eec0c175ed55c4bb0914f4814d"
+  },
+  "android/app/src/test/java/com/zibi/app/ProtocolTest.kt": {
+    "mtime": 1792680350.0,
+    "seen": 1793714019.6245334,
+    "ast_hash": "0cf40343bd0ef562088c65d496c0a5c7",
+    "semantic_hash": "0cf40343bd0ef562088c65d496c0a5c7"
+  },
+  "android/app/src/test/java/com/zibi/app/RedactorTest.kt": {
+    "mtime": 1793472796.0,
+    "seen": 1793714019.6245344,
+    "ast_hash": "af6378dedfd84c5d900fb494d313d15d",
+    "semantic_hash": "af6378dedfd84c5d900fb494d313d15d"
+  },
+  "android/app/src/test/java/com/zibi/app/SharedTextTest.kt": {
+    "mtime": 1793594268.6615334,
+    "seen": 1793714019.6245348,
+    "ast_hash": "b33ed566edd4b75198b997da5d579f53",
+    "semantic_hash": "b33ed566edd4b75198b997da5d579f53"
+  },
+  "android/app/src/test/java/com/zibi/app/TestFakes.kt": {
+    "mtime": 1793472796.0,
+    "seen": 1793714019.6245353,
+    "ast_hash": "8bd91ae898cb5eeece72b978a1de6f26",
+    "semantic_hash": "8bd91ae898cb5eeece72b978a1de6f26"
+  },
+  "android/app/src/test/java/com/zibi/app/VaultTest.kt": {
+    "mtime": 1793506644.0,
+    "seen": 1793714019.624536,
+    "ast_hash": "e5737a35dd58df390f8cedb1a1612470",
+    "semantic_hash": "e5737a35dd58df390f8cedb1a1612470"
+  },
+  "android/build.gradle.kts": {
+    "mtime": 1792680184.0,
+    "seen": 1793714019.6245365,
+    "ast_hash": "b938f07e9cf543d1c5c5eae802b4a5a4",
+    "semantic_hash": "b938f07e9cf543d1c5c5eae802b4a5a4"
+  },
+  "android/gradlew": {
+    "mtime": 1792680350.0,
+    "seen": 1793714019.6245372,
+    "ast_hash": "da8caf41291a44f86a85f27f2148970a",
+    "semantic_hash": "da8caf41291a44f86a85f27f2148970a"
+  },
+  "android/settings.gradle.kts": {
+    "mtime": 1792680184.0,
+    "seen": 1793714019.624538,
+    "ast_hash": "6a48af4f23be2fe5657cb1948f18796f",
+    "semantic_hash": "6a48af4f23be2fe5657cb1948f18796f"
+  },
+  "backend/config/models.yaml": {
+    "mtime": 1793544119.5053828,
+    "seen": 1793714019.6245387,
+    "ast_hash": "db5efc0cf448e5aa794fb494bb7e689a",
+    "semantic_hash": "db5efc0cf448e5aa794fb494bb7e689a"
+  },
+  "backend/pyproject.toml": {
+    "mtime": 1793531060.0339363,
+    "seen": 1793714019.6245391,
+    "ast_hash": "a8806a34ec8a9fef310f4a3d4d2deb77",
+    "semantic_hash": "a8806a34ec8a9fef310f4a3d4d2deb77"
+  },
+  "backend/scripts/check_models.py": {
+    "mtime": 1793544147.0842497,
+    "seen": 1793714019.6245396,
+    "ast_hash": "16eb4d7d0a67071cd3ce4fed406f38fa",
+    "semantic_hash": "16eb4d7d0a67071cd3ce4fed406f38fa"
+  },
+  "backend/scripts/phone_sim.py": {
+    "mtime": 1792709970.0,
+    "seen": 1793714019.6245403,
+    "ast_hash": "71659a1dcc7cd2ea640b311103d88c4c",
+    "semantic_hash": "71659a1dcc7cd2ea640b311103d88c4c"
+  },
+  "backend/tests/__init__.py": {
+    "mtime": 1792679138.0,
+    "seen": 1793714019.6245413,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "backend/tests/conftest.py": {
+    "mtime": 1792726906.0,
+    "seen": 1793714019.624542,
+    "ast_hash": "3a12e09511aa89869751ccc867dda625",
+    "semantic_hash": "3a12e09511aa89869751ccc867dda625"
+  },
+  "backend/tests/test_agent.py": {
+    "mtime": 1793561822.9877505,
+    "seen": 1793714019.6245427,
+    "ast_hash": "93d9a659df62c7dca583a0e63fe62fa8",
+    "semantic_hash": "93d9a659df62c7dca583a0e63fe62fa8"
+  },
+  "backend/tests/test_context.py": {
+    "mtime": 1793592735.2374234,
+    "seen": 1793714019.6245432,
+    "ast_hash": "a7467c407425bb1535e1732fb3f7bb4e",
+    "semantic_hash": "a7467c407425bb1535e1732fb3f7bb4e"
+  },
+  "backend/tests/test_conversations.py": {
+    "mtime": 1792729616.0,
+    "seen": 1793714019.6245437,
+    "ast_hash": "f018b1dc9acb192d6b876d30186f982f",
+    "semantic_hash": "f018b1dc9acb192d6b876d30186f982f"
+  },
+  "backend/tests/test_dates.py": {
+    "mtime": 1793560845.652755,
+    "seen": 1793714019.6245446,
+    "ast_hash": "5e1f3d7aa5db71e9f1fa43a40844297e",
+    "semantic_hash": "5e1f3d7aa5db71e9f1fa43a40844297e"
+  },
+  "backend/tests/test_documents_api.py": {
+    "mtime": 1792726906.0,
+    "seen": 1793714019.624545,
+    "ast_hash": "80dbdb52f07caef3fd780235deb4917f",
+    "semantic_hash": "80dbdb52f07caef3fd780235deb4917f"
+  },
+  "backend/tests/test_grounding.py": {
+    "mtime": 1793454856.0,
+    "seen": 1793714019.6245456,
+    "ast_hash": "1d01912dc03e45ed65b674507e3d098a",
+    "semantic_hash": "1d01912dc03e45ed65b674507e3d098a"
+  },
+  "backend/tests/test_llm_client.py": {
+    "mtime": 1792934830.0,
+    "seen": 1793714019.6245463,
+    "ast_hash": "012caa85e56c43ebb7fedd75c46b3e75",
+    "semantic_hash": "012caa85e56c43ebb7fedd75c46b3e75"
+  },
+  "backend/tests/test_privacy.py": {
+    "mtime": 1793454876.0,
+    "seen": 1793714019.6245468,
+    "ast_hash": "08517bb7be339b40ebb9a933e710e4e5",
+    "semantic_hash": "08517bb7be339b40ebb9a933e710e4e5"
+  },
+  "backend/tests/test_rag.py": {
+    "mtime": 1793454856.0,
+    "seen": 1793714019.6245472,
+    "ast_hash": "703f724b129e47770a9c2014af05e942",
+    "semantic_hash": "703f724b129e47770a9c2014af05e942"
+  },
+  "backend/tests/test_registry_and_config.py": {
+    "mtime": 1792934830.0,
+    "seen": 1793714019.6245482,
+    "ast_hash": "cf3b6957f0738c03626d8c57f1220133",
+    "semantic_hash": "cf3b6957f0738c03626d8c57f1220133"
+  },
+  "backend/tests/test_stt_api.py": {
+    "mtime": 1793536290.7462652,
+    "seen": 1793714019.6245487,
+    "ast_hash": "ff2c37daec5349cffb2a535d041822ec",
+    "semantic_hash": "ff2c37daec5349cffb2a535d041822ec"
+  },
+  "backend/tests/test_ws.py": {
+    "mtime": 1793592739.0773652,
+    "seen": 1793714019.6245492,
+    "ast_hash": "0b4ef20343c84ca50a99c075139f3e9a",
+    "semantic_hash": "0b4ef20343c84ca50a99c075139f3e9a"
+  },
+  "backend/zibi/__init__.py": {
+    "mtime": 1792679072.0,
+    "seen": 1793714019.6245499,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "backend/zibi/agent.py": {
+    "mtime": 1793437182.0,
+    "seen": 1793714019.6245506,
+    "ast_hash": "465ff8f7e516d38cac4cdafab885fbed",
+    "semantic_hash": "465ff8f7e516d38cac4cdafab885fbed"
+  },
+  "backend/zibi/config.py": {
+    "mtime": 1793543944.3537343,
+    "seen": 1793714019.624551,
+    "ast_hash": "00c64d27d7da537ea6be203e074d1a34",
+    "semantic_hash": "00c64d27d7da537ea6be203e074d1a34"
+  },
+  "backend/zibi/context.py": {
+    "mtime": 1793592635.8228648,
+    "seen": 1793714019.624552,
+    "ast_hash": "6e3add9e7877fd1df0f16106aa73ebd5",
+    "semantic_hash": "6e3add9e7877fd1df0f16106aa73ebd5"
+  },
+  "backend/zibi/conversations.py": {
+    "mtime": 1792729562.0,
+    "seen": 1793714019.6245525,
+    "ast_hash": "284483e914b01d798d9bca3d04b7c4c3",
+    "semantic_hash": "284483e914b01d798d9bca3d04b7c4c3"
+  },
+  "backend/zibi/grounding.py": {
+    "mtime": 1793437182.0,
+    "seen": 1793714019.6245532,
+    "ast_hash": "6ca1d7f5ea2d50152bef702c08d81cf8",
+    "semantic_hash": "6ca1d7f5ea2d50152bef702c08d81cf8"
+  },
+  "backend/zibi/llm/__init__.py": {
+    "mtime": 1792679072.0,
+    "seen": 1793714019.6245537,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "backend/zibi/llm/base.py": {
+    "mtime": 1792848732.0,
+    "seen": 1793714019.6245544,
+    "ast_hash": "d86429936521cc1e172c905661f9eb17",
+    "semantic_hash": "d86429936521cc1e172c905661f9eb17"
+  },
+  "backend/zibi/llm/fake.py": {
+    "mtime": 1792729564.0,
+    "seen": 1793714019.624555,
+    "ast_hash": "8ae1b1ffaecfc6460307cf5589e1402e",
+    "semantic_hash": "8ae1b1ffaecfc6460307cf5589e1402e"
+  },
+  "backend/zibi/llm/litellm_client.py": {
+    "mtime": 1793543944.3997345,
+    "seen": 1793714019.6245565,
+    "ast_hash": "738b7d1dc2205a6e3b19e270ee7170b7",
+    "semantic_hash": "738b7d1dc2205a6e3b19e270ee7170b7"
+  },
+  "backend/zibi/main.py": {
+    "mtime": 1792934808.0,
+    "seen": 1793714019.6245573,
+    "ast_hash": "339cf85b367b0c5916bcbf52f7da7e57",
+    "semantic_hash": "339cf85b367b0c5916bcbf52f7da7e57"
+  },
+  "backend/zibi/policy.py": {
+    "mtime": 1792679098.0,
+    "seen": 1793714019.6245577,
+    "ast_hash": "6810cac86b0a080c32ac4237a43dcad3",
+    "semantic_hash": "6810cac86b0a080c32ac4237a43dcad3"
+  },
+  "backend/zibi/privacy.py": {
+    "mtime": 1793454876.0,
+    "seen": 1793714019.6245587,
+    "ast_hash": "00e3e454b29f9629ab4303de6777aceb",
+    "semantic_hash": "00e3e454b29f9629ab4303de6777aceb"
+  },
+  "backend/zibi/protocol.py": {
+    "mtime": 1792709970.0,
+    "seen": 1793714019.6245594,
+    "ast_hash": "83e883772e14c5000230fbe8fe607065",
+    "semantic_hash": "83e883772e14c5000230fbe8fe607065"
+  },
+  "backend/zibi/rag.py": {
+    "mtime": 1792726874.0,
+    "seen": 1793714019.6245599,
+    "ast_hash": "24d16094a488cd1343b5e0b48917376d",
+    "semantic_hash": "24d16094a488cd1343b5e0b48917376d"
+  },
+  "backend/zibi/server.py": {
+    "mtime": 1793592689.6761491,
+    "seen": 1793714019.6245606,
+    "ast_hash": "f4c5c6f4b1ba29dbb80dfdb922691247",
+    "semantic_hash": "f4c5c6f4b1ba29dbb80dfdb922691247"
+  },
+  "backend/zibi/session.py": {
+    "mtime": 1792729564.0,
+    "seen": 1793714019.624561,
+    "ast_hash": "fd4f280f503c650203f6b59bcc6aa052",
+    "semantic_hash": "fd4f280f503c650203f6b59bcc6aa052"
+  },
+  "backend/zibi/stt.py": {
+    "mtime": 1793535713.8451283,
+    "seen": 1793714019.6245615,
+    "ast_hash": "69a89ee230240583b86734e81d58db77",
+    "semantic_hash": "69a89ee230240583b86734e81d58db77"
+  },
+  "backend/zibi/tools/__init__.py": {
+    "mtime": 1792679072.0,
+    "seen": 1793714019.6245623,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "backend/zibi/tools/base.py": {
+    "mtime": 1793437182.0,
+    "seen": 1793714019.624563,
+    "ast_hash": "8c4c2df404c8d0d5d7dd7c2c09d42845",
+    "semantic_hash": "8c4c2df404c8d0d5d7dd7c2c09d42845"
+  },
+  "backend/zibi/tools/cloud.py": {
+    "mtime": 1793560891.7005925,
+    "seen": 1793714019.6245635,
+    "ast_hash": "ee880a8e1a0451a93ca947a45533b532",
+    "semantic_hash": "ee880a8e1a0451a93ca947a45533b532"
+  },
+  "backend/zibi/tools/registry.py": {
+    "mtime": 1792848732.0,
+    "seen": 1793714019.624564,
+    "ast_hash": "6ccb80cabbe1257bec5349e701024fe5",
+    "semantic_hash": "6ccb80cabbe1257bec5349e701024fe5"
+  },
+  "CLAUDE.md": {
+    "mtime": 1793530021.7776203,
+    "seen": 1793714019.6245644,
+    "ast_hash": "ad3cb97b71b1c7df3b83c2072d2a06c1",
+    "semantic_hash": "ad3cb97b71b1c7df3b83c2072d2a06c1"
+  },
+  "README.md": {
+    "mtime": 1793506672.0,
+    "seen": 1793714019.6245654,
+    "ast_hash": "9742884a7dfda5953165c0a2fac1baf9",
+    "semantic_hash": "9742884a7dfda5953165c0a2fac1baf9"
+  },
+  "android/README.md": {
+    "mtime": 1793506672.0,
+    "seen": 1793714019.6245658,
+    "ast_hash": "d7af00b28266941aab0642ae593a002e",
+    "semantic_hash": "d7af00b28266941aab0642ae593a002e"
+  },
+  "protocol/PROTOCOL.md": {
+    "mtime": 1793592765.2696955,
+    "seen": 1793714019.6245663,
+    "ast_hash": "8b2791bb6087de91d5916476a33c25cb",
+    "semantic_hash": "8b2791bb6087de91d5916476a33c25cb"
+  }
+}

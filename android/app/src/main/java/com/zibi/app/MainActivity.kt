@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         requestedScreen = intent.getStringExtra(EXTRA_SCREEN)
         container.permissions.attach(
+            owner = this,
             launch = { permissionLauncher.launch(it) },
             launchExactAlarmSettings = {
                 exactAlarmSettingsLauncher.launch(
@@ -78,7 +79,7 @@ class MainActivity : ComponentActivity() {
             intent.getCharSequenceExtra(Intent.EXTRA_TEXT)
         }
         val text = extractIncomingSharedText(intent.action, intent.type, sharedText) ?: return
-        requestedScreen = SCREEN_CHAT
+        // Shared text goes to chat VM - it's handled by the bubble overlay
         container.chatVm.processSharedContent(text)
     }
 
@@ -95,7 +96,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        container.permissions.detach()
+        container.permissions.detach(this)
         super.onDestroy()
     }
 

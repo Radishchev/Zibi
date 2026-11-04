@@ -97,5 +97,10 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Floating chat bubble for one-tap access to the Zibi assistant" />
         </service>
+
+        <activity
+            android:name=".PermissionActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 </manifest>

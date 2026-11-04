@@ -5,7 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Switch
@@ -25,10 +27,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.platform.LocalContext
 import com.zibi.app.AppContainer
 import com.zibi.app.appContainer
 import com.zibi.app.bubble.BubbleService
+import com.zibi.app.net.ConnState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -40,12 +44,18 @@ class SettingsViewModel(private val c: AppContainer) : ViewModel() {
     var bubbleEnabled by mutableStateOf(false)
     var canDrawOverlays by mutableStateOf(false)
 
+    val connection = c.client.state
+
     init {
         viewModelScope.launch {
             url = c.settings.serverUrl.first()
             token = c.settings.token.first()
             c.settings.bubbleEnabled.collect { bubbleEnabled = it }
         }
+    }
+
+    fun reconnect() {
+        c.client.reconnect()
     }
 
     fun clearMemory() {
@@ -114,6 +124,7 @@ fun SettingsScreen(vm: SettingsViewModel = appContainer().settingsVm) {
 
     Column(Modifier.fillMaxSize().padding(16.dp)) {
         Text("Server", style = MaterialTheme.typography.titleMedium)
+        ConnectionStatus(vm)
         OutlinedTextField(
             value = vm.url,
             onValueChange = { vm.url = it; vm.saved = false },
@@ -167,5 +178,41 @@ fun SettingsScreen(vm: SettingsViewModel = appContainer().settingsVm) {
         )
         Button(onClick = vm::clearMemory) { Text("Clear conversation memory") }
         vm.status?.let { Text(it, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 8.dp)) }
+    }
+}
+
+/** Live backend connection status. Lives here rather than in the chat UI. */
+@Composable
+private fun ConnectionStatus(vm: SettingsViewModel) {
+    val conn by vm.connection.collectAsStateWithLifecycle()
+    val state = conn
+    val label = when (state) {
+        ConnState.Connected -> "Connected"
+        ConnState.Connecting -> "Connecting…"
+        ConnState.Disconnected -> "Offline"
+        is ConnState.Failed -> "Offline: ${state.message}"
+    }
+    val tint = when (state) {
+        ConnState.Connected -> MaterialTheme.colorScheme.primary
+        ConnState.Connecting -> MaterialTheme.colorScheme.onSurfaceVariant
+        else -> MaterialTheme.colorScheme.error
+    }
+    Row(
+        Modifier.fillMaxWidth().padding(top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(8.dp).background(tint, CircleShape))
+            Text(
+                label,
+                style = MaterialTheme.typography.labelLarge,
+                color = tint,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+        if (state !is ConnState.Connected && state !is ConnState.Connecting) {
+            TextButton(onClick = vm::reconnect) { Text("Reconnect") }
+        }
     }
 }
