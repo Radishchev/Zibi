@@ -146,12 +146,22 @@ fun QuickScreen(vm: QuickViewModel = appContainer().quickVm) {
         }
         if (nothing) {
             item {
-                Text(
-                    "Nothing here yet.\nTell Zibi things in the Chat tab and they show up here: lists you can tick off, " +
-                        "tasks, and messages ready to send.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(16.dp),
-                )
+                Column(
+                    Modifier.fillMaxWidth().padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        "Nothing to do yet",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        "Lists you tick off, tasks and messages waiting to go out show up here.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
             }
         }
         if (s.handoffs.isNotEmpty()) {
@@ -162,9 +172,21 @@ fun QuickScreen(vm: QuickViewModel = appContainer().quickVm) {
                             Text(h.title, style = MaterialTheme.typography.labelLarge)
                             Text(h.prompt, maxLines = 4, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(vertical = 4.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(onClick = { vm.openHandoff(h, HandoffTarget.Claude) }) { Text("Claude") }
-                                Button(onClick = { vm.openHandoff(h, HandoffTarget.ChatGpt) }) { Text("ChatGPT") }
-                                OutlinedButton(onClick = { vm.openHandoff(h, HandoffTarget.Other) }) { Text("Other") }
+                                Button(
+                                    onClick = { vm.openHandoff(h, HandoffTarget.Claude) },
+                                    modifier = Modifier.weight(1f),
+                                    contentPadding = PaddingValues(horizontal = 8.dp),
+                                ) { Text("Claude", maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                                Button(
+                                    onClick = { vm.openHandoff(h, HandoffTarget.ChatGpt) },
+                                    modifier = Modifier.weight(1f),
+                                    contentPadding = PaddingValues(horizontal = 8.dp),
+                                ) { Text("ChatGPT", maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                                OutlinedButton(
+                                    onClick = { vm.openHandoff(h, HandoffTarget.Other) },
+                                    modifier = Modifier.weight(1f),
+                                    contentPadding = PaddingValues(horizontal = 8.dp),
+                                ) { Text("Other", maxLines = 1, overflow = TextOverflow.Ellipsis) }
                             }
                             TextButton(onClick = { vm.dismissHandoff(h) }) { Text("Dismiss") }
                         }
@@ -261,9 +283,21 @@ private fun DraftRow(d: MessageDraft, vm: QuickViewModel) {
         Text(d.text, maxLines = 3, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(vertical = 4.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             if (app == null) {
-                OutlinedButton(onClick = { vm.openDraft(d, "sms") }) { Text("SMS") }
-                OutlinedButton(onClick = { vm.openDraft(d, "whatsapp") }) { Text("WhatsApp") }
-                OutlinedButton(onClick = { vm.openDraft(d, "email") }) { Text("Email") }
+                OutlinedButton(
+                    onClick = { vm.openDraft(d, "sms") },
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                ) { Text("SMS", maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                OutlinedButton(
+                    onClick = { vm.openDraft(d, "whatsapp") },
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                ) { Text("WhatsApp", maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                OutlinedButton(
+                    onClick = { vm.openDraft(d, "email") },
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                ) { Text("Email", maxLines = 1, overflow = TextOverflow.Ellipsis) }
             } else {
                 val label = when (app) { "whatsapp" -> "WhatsApp"; "email" -> "Email"; else -> "SMS" }
                 Button(onClick = { vm.openDraft(d, app) }) {

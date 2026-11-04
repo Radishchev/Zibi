@@ -1,5 +1,6 @@
 package com.zibi.app.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +19,18 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zibi.app.appContainer
@@ -54,19 +60,12 @@ fun ChatScreen(vm: ChatViewModel = appContainer().chatVm) {
 
     Column(Modifier.fillMaxSize().imePadding()) {
         if (chat.isEmpty()) {
-            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(
-                    "Just tell Zibi what's on your mind.\nTry: \"grocery list: milk, eggs. Tell Sam about project X. Fix the login bug in project X.\"",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(24.dp),
-                )
-            }
+            EmptyState(Modifier.weight(1f).fillMaxWidth()) { vm.draft.value = it }
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 state = listState,
-                contentPadding = PaddingValues(12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(chat, key = { it.id }) { item -> ChatRow(item, onDecision = vm::decide, onAnswer = vm::answer, onHandoff = vm::openHandoff) }
@@ -74,30 +73,92 @@ fun ChatScreen(vm: ChatViewModel = appContainer().chatVm) {
         }
         if (busy || transcribing) LinearProgressIndicator(Modifier.fillMaxWidth())
         Row(
-            Modifier.fillMaxWidth().padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            OutlinedTextField(
+            TextField(
                 value = input,
                 onValueChange = { vm.draft.value = it },
                 modifier = Modifier.weight(1f),
                 placeholder = { Text(if (recording) "Recording… tap the mic to stop" else "Tell Zibi something…") },
                 maxLines = 4,
+                shape = RoundedCornerShape(22.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
             )
-            IconButton(
+            FilledTonalIconButton(
                 onClick = vm::toggleRecording,
                 enabled = !busy && !transcribing,
+                colors = if (recording) {
+                    IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
+                    )
+                } else {
+                    IconButtonDefaults.filledTonalIconButtonColors()
+                },
             ) {
                 Icon(
                     Icons.Filled.Mic,
                     contentDescription = if (recording) "Stop recording" else "Record voice message",
-                    tint = if (recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 )
             }
-            IconButton(
+            FilledIconButton(
                 onClick = { vm.send(input) },
                 enabled = input.isNotBlank(),
-            ) { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send") }
+            ) {
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyState(modifier: Modifier = Modifier, onPick: (String) -> Unit) {
+    val examples = listOf(
+        "Grocery list: milk, eggs, coffee",
+        "Tell Sam about project X",
+        "Remind me to call the dentist Friday",
+    )
+    Column(
+        modifier = modifier.padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            "What should Zibi take care of?",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            "Say it, type it, or tap an example.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Column(
+            Modifier.padding(top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            examples.forEach { example ->
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.clickable { onPick(example) },
+                ) {
+                    Text(
+                        example,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    )
+                }
+            }
         }
     }
 }
@@ -118,7 +179,7 @@ private fun ChatRow(
         }
         is ChatItem.Assistant -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
             Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = RoundedCornerShape(16.dp),
             ) { Text(item.text, Modifier.padding(12.dp)) }
         }

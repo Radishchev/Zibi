@@ -1,10 +1,9 @@
 package com.zibi.app.bubble
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,11 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,15 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import com.zibi.app.PermissionActivity
 import com.zibi.app.appContainer
 import com.zibi.app.ui.ChatScreen
 import com.zibi.app.ui.QuickScreen
@@ -74,123 +70,113 @@ fun BubbleOverlay(
     val isExpanded = panelState.value.expanded
     val currentTab = panelState.value.tab
 
-    // Notify service when panel expansion changes
     LaunchedEffect(isExpanded) {
         onPanelExpandedChanged(isExpanded)
     }
 
-    Box(contentAlignment = Alignment.Center) {
-        if (!isExpanded) {
-            // Collapsed: iPhone 5-style AssistiveTouch bubble
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .background(
-                        color = Color(0xFF1A1A2E), // Dark charcoal
-                        shape = CircleShape,
-                    )
-                    .graphicsLayer { shadowElevation = 8f }
-                    .pointerInteropFilter { event ->
-                        when (event.actionMasked) {
-                            MotionEvent.ACTION_DOWN -> {
-                                downRawX = event.rawX
-                                downRawY = event.rawY
-                                dragging = false
-                                onDragStart(downRawX, downRawY)
-                            }
-                            MotionEvent.ACTION_MOVE -> {
-                                if (!dragging && hypot(event.rawX - downRawX, event.rawY - downRawY) > touchSlop) {
-                                    dragging = true
-                                }
-                                if (dragging) onDrag(event.rawX, event.rawY)
-                            }
-                            MotionEvent.ACTION_UP -> {
-                                if (dragging) {
-                                    onDrag(event.rawX, event.rawY)
-                                    onDragEnd()
-                                } else {
-                                    panelState.value = BubblePanelState.open()
-                                }
-                                dragging = false
-                            }
-                            MotionEvent.ACTION_CANCEL -> {
-                                if (dragging) onDragEnd()
-                                dragging = false
-                            }
+    if (!isExpanded) {
+        // Collapsed: AssistiveTouch-style floating bubble
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .shadow(8.dp, CircleShape)
+                .background(MaterialTheme.colorScheme.surface, CircleShape)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape)
+                .pointerInteropFilter { event ->
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> {
+                            downRawX = event.rawX
+                            downRawY = event.rawY
+                            dragging = false
+                            onDragStart(downRawX, downRawY)
                         }
-                        true
-                    },
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = if (recording) Icons.Filled.Pause else Icons.Filled.Mic,
-                    contentDescription = if (recording) "Recording - tap to stop" else "Open Zibi",
-                    tint = if (recording) Color.Red else Color.White,
-                )
-            }
-        } else {
-            // Expanded: Floating panel with Chat and Quick tabs
-            val panelWidth = 320.dp
-            val panelHeight = 480.dp
+                        MotionEvent.ACTION_MOVE -> {
+                            if (!dragging && hypot(event.rawX - downRawX, event.rawY - downRawY) > touchSlop) {
+                                dragging = true
+                            }
+                            if (dragging) onDrag(event.rawX, event.rawY)
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            if (dragging) {
+                                onDrag(event.rawX, event.rawY)
+                                onDragEnd()
+                            } else {
+                                panelState.value = BubblePanelState.open()
+                            }
+                            dragging = false
+                        }
+                        MotionEvent.ACTION_CANCEL -> {
+                            if (dragging) onDragEnd()
+                            dragging = false
+                        }
+                    }
+                    true
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = if (recording) Icons.Filled.Pause else Icons.Filled.Mic,
+                contentDescription = if (recording) "Recording - tap to stop" else "Open Zibi",
+                tint = if (recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    } else {
+        // Expanded: the overlay window is sized to exactly the panel, so only the
+        // close button dismisses it.
+        val panelWidth = 320.dp
+        val panelHeight = 480.dp
 
-            // Panel - the overlay window is sized to exactly the panel, so there is
-            // no backdrop to render. Only the close button dismisses the panel.
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(panelWidth)
-                        .height(panelHeight)
-                        .background(
-                            color = Color(0xFF1A1A2E), // Dark charcoal
-                            shape = RoundedCornerShape(20.dp),
-                        )
-                        .graphicsLayer { shadowElevation = 20f },
+        Box(
+            modifier = Modifier
+                .width(panelWidth)
+                .height(panelHeight)
+                .shadow(16.dp, RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(20.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp)),
+        ) {
+            Column(Modifier.fillMaxSize()) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                        .padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(Modifier.fillMaxSize()) {
-                        // Header with tab selector and close button - fixed height
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            // Tab buttons - simple text
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                TabText(
-                                    label = "Chat",
-                                    selected = currentTab == BubblePanelTab.Chat,
-                                    onClick = { panelState.value = panelState.value.select(BubblePanelTab.Chat) },
-                                )
-                                TabText(
-                                    label = "Quick",
-                                    selected = currentTab == BubblePanelTab.Quick,
-                                    onClick = { panelState.value = panelState.value.select(BubblePanelTab.Quick) },
-                                )
-                            }
-                            // Close button - large prominent red circle with X
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .background(Color(0xFFFF3B30), CircleShape)
-                                    .clickable { panelState.value = panelState.value.close() }
-                                    .semantics { contentDescription = "Close panel" },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(Icons.Filled.Close, tint = Color.White, contentDescription = "", modifier = Modifier.size(24.dp))
-                            }
-                        }
-                        // Content - fill remaining space, handles IME resize
-                        Box(Modifier.weight(1f).fillMaxSize()) {
-                            when (currentTab) {
-                                BubblePanelTab.Chat -> ChatScreen(vm = chatVm)
-                                BubblePanelTab.Quick -> QuickScreen(vm = quickVm)
-                            }
-                        }
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        TabPill(
+                            label = "Chat",
+                            selected = currentTab == BubblePanelTab.Chat,
+                            onClick = { panelState.value = panelState.value.select(BubblePanelTab.Chat) },
+                        )
+                        TabPill(
+                            label = "Quick",
+                            selected = currentTab == BubblePanelTab.Quick,
+                            onClick = { panelState.value = panelState.value.select(BubblePanelTab.Quick) },
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(MaterialTheme.colorScheme.error, CircleShape)
+                            .clickable { panelState.value = panelState.value.close() }
+                            .semantics { contentDescription = "Close panel" },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Filled.Close,
+                            tint = MaterialTheme.colorScheme.onError,
+                            contentDescription = "",
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                }
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                Box(Modifier.weight(1f).fillMaxSize()) {
+                    when (currentTab) {
+                        BubblePanelTab.Chat -> ChatScreen(vm = chatVm)
+                        BubblePanelTab.Quick -> QuickScreen(vm = quickVm)
                     }
                 }
             }
@@ -199,19 +185,30 @@ fun BubbleOverlay(
 }
 
 @Composable
-private fun TabText(
+private fun TabPill(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    Text(
-        text = label,
-        color = if (selected) Color.White else Color.White.copy(alpha = 0.6f),
-        fontSize = 16.sp,
-        fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.Medium else androidx.compose.ui.text.font.FontWeight.Normal,
+    Box(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(
+                color = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                shape = RoundedCornerShape(18.dp),
+            )
             .clickable { onClick() }
-            .semantics { contentDescription = label },
-    )
+            .semantics { contentDescription = label }
+            .padding(horizontal = 14.dp, vertical = 7.dp),
+    ) {
+        Text(
+            text = label,
+            color = if (selected) {
+                MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            fontSize = 14.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+        )
+    }
 }

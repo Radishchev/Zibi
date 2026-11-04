@@ -1,79 +1,77 @@
 package com.zibi.app.ui
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
-// Zibi brand colors matching the bubble overlay design
-private val DarkCharcoal = Color(0xFF1A1A2E)
-private val DarkCharcoalLighter = Color(0xFF1E1E2E)
-private val ZibiWhite = Color.White
-private val ZibiRed = Color(0xFFFF0000)
+// Zibi is a dark-first product: the floating bubble and the app share one palette,
+// so the panel never looks like a different app from the screens inside it.
+private val Ink = Color(0xFF17171F) // surface
+private val InkDeep = Color(0xFF101017) // background
+private val InkLow = Color(0xFF1E1E28)
+private val InkMid = Color(0xFF262633)
+private val InkHigh = Color(0xFF2F2F3E)
+private val InkHighest = Color(0xFF383849)
+private val Mist = Color(0xFFEDEDF3) // onSurface
+private val MistMuted = Color(0xFFA6A6BA) // onSurfaceVariant
 
-private val DarkColorScheme = darkColorScheme(
-    primary = ZibiWhite,
-    primaryContainer = DarkCharcoalLighter,
-    secondary = ZibiWhite,
-    secondaryContainer = DarkCharcoalLighter,
-    tertiary = ZibiRed,
-    tertiaryContainer = DarkCharcoal,
-    surface = DarkCharcoal,
-    surfaceVariant = DarkCharcoalLighter,
-    background = DarkCharcoal,
-    onPrimary = DarkCharcoal,
-    onPrimaryContainer = ZibiWhite,
-    onSecondary = DarkCharcoal,
-    onSecondaryContainer = ZibiWhite,
-    onTertiary = ZibiWhite,
-    onTertiaryContainer = ZibiWhite,
-    onSurface = ZibiWhite,
-    onSurfaceVariant = ZibiWhite.copy(alpha = 0.7f),
-    onBackground = ZibiWhite,
-    error = ZibiRed,
-    onError = ZibiWhite,
-    errorContainer = DarkCharcoalLighter,
-    onErrorContainer = ZibiWhite,
-    outline = ZibiWhite.copy(alpha = 0.3f),
-    outlineVariant = ZibiWhite.copy(alpha = 0.15f),
+private val Accent = Color(0xFF7E9BFF) // primary
+private val AccentDeep = Color(0xFF0D1330) // onPrimary
+private val AccentContainer = Color(0xFF2A3566)
+private val AccentContainerText = Color(0xFFDCE3FF)
+
+private val Alarm = Color(0xFFFF6B6B) // recording / error
+private val AlarmDeep = Color(0xFF3B0A0A)
+private val AlarmContainer = Color(0xFF5C1F1F)
+private val AlarmContainerText = Color(0xFFFFDAD6)
+
+private val ZibiDarkScheme = darkColorScheme(
+    primary = Accent,
+    onPrimary = AccentDeep,
+    primaryContainer = AccentContainer,
+    onPrimaryContainer = AccentContainerText,
+    inversePrimary = AccentContainer,
+
+    secondary = Color(0xFFB9B9CC),
+    onSecondary = Color(0xFF232330),
+    secondaryContainer = InkHigh,
+    onSecondaryContainer = Color(0xFFE1E1EC),
+
+    tertiary = Alarm,
+    onTertiary = AlarmDeep,
+    tertiaryContainer = AlarmContainer,
+    onTertiaryContainer = AlarmContainerText,
+
+    background = InkDeep,
+    onBackground = Mist,
+    surface = Ink,
+    onSurface = Mist,
+    surfaceVariant = InkHigh,
+    onSurfaceVariant = MistMuted,
+    surfaceTint = Accent,
+    surfaceDim = InkDeep,
+    surfaceBright = InkHighest,
+    surfaceContainerLowest = InkDeep,
+    surfaceContainerLow = InkLow,
+    surfaceContainer = InkMid,
+    surfaceContainerHigh = InkHigh,
+    surfaceContainerHighest = InkHighest,
+
+    inverseSurface = Mist,
+    inverseOnSurface = Ink,
+
+    error = Alarm,
+    onError = AlarmDeep,
+    errorContainer = AlarmContainer,
+    onErrorContainer = AlarmContainerText,
+
+    outline = Color(0xFF49495E),
+    outlineVariant = Color(0xFF2F2F3C),
     scrim = Color.Black,
-    inverseSurface = ZibiWhite,
-    inverseOnSurface = DarkCharcoal,
-    inversePrimary = DarkCharcoal,
 )
 
 @Composable
 fun ZibiTheme(content: @Composable () -> Unit) {
-    val dark = isSystemInDarkTheme()
-    val context = LocalContext.current
-    val scheme = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
-            if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        dark -> DarkColorScheme
-        else -> lightColorScheme(
-            primary = DarkCharcoal,
-            primaryContainer = ZibiWhite,
-            secondary = DarkCharcoal,
-            secondaryContainer = ZibiWhite,
-            tertiary = ZibiRed,
-            surface = ZibiWhite,
-            surfaceVariant = ZibiWhite.copy(alpha = 0.9f),
-            background = ZibiWhite,
-            onPrimary = ZibiWhite,
-            onPrimaryContainer = DarkCharcoal,
-            onSecondary = ZibiWhite,
-            onSecondaryContainer = DarkCharcoal,
-            onTertiary = ZibiWhite,
-            onSurface = DarkCharcoal,
-            onSurfaceVariant = DarkCharcoal.copy(alpha = 0.7f),
-            onBackground = DarkCharcoal,
-        )
-    }
-    MaterialTheme(colorScheme = scheme, content = content)
+    MaterialTheme(colorScheme = ZibiDarkScheme, content = content)
 }

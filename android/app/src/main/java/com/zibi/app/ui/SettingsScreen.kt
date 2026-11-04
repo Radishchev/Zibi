@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -122,7 +124,12 @@ fun SettingsScreen(vm: SettingsViewModel = appContainer().settingsVm) {
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+    ) {
         Text("Server", style = MaterialTheme.typography.titleMedium)
         ConnectionStatus(vm)
         OutlinedTextField(
